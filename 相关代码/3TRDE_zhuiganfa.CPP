@@ -1,5 +1,5 @@
   //3TRDE.CPP
-  //求解三对角方程组
+  //追赶法求解三对角方程组
   #include  <iostream>
   #include  <fstream>
   #include  <cmath>

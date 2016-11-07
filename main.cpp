@@ -15,7 +15,7 @@ int main()
 	{
 		cout << "请输入吸收边界类型:\n" << endl;
 		cout << "金属吸收边界请按--1\n" << endl;
-		cout << "Mur吸收边界请按--2\n" << endl;
+		cout << "Mur吸收边界请按--2(维护中)\n" << endl;
 		cin >> choice;
 		if (choice == 1)
 		{

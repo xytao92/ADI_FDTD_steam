@@ -43,7 +43,7 @@ void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 
 }
 
-void save_result( Grid* halfgrid_now,int step)//网格的初始化
+void save_result( Grid* halfgrid_now,int step)
 {
 	system("mkdir result");
 	ofstream file("result\\leapforg_ADI_FDTD_steam0.1.txt");//用于保存结果
@@ -69,11 +69,45 @@ void inject_field(Grid* halfgrid_before,int step)//计算激励源//
 	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100为设置值//
 }
 
+void trade(double*b, int n, int m, double*d)
+{
+	double s = 0;
+	int j, k;
+	if (m != 3 * n - 2)//首先判断是否满足三对角矩阵的结构条件
+	{
+		cout << "矩阵不满足三对角矩阵的条件！" << endl;
+	}
+	for (int k = 0; k <= n - 2; k++)
+	{
+		int j = k * 3;
+		double s = b[j];
+		if (fabs(s) + 1.0 == 1.0)//fabs()函数是求浮点数的绝对值，返回类型为double
+		{
+			cout << "分母为0、计算错误！" << endl;
+		}
+		b[j + 1] = b[j + 1] / s;//系数矩阵归一化
+		d[k] = d[k] / s;//常数向量归一化
+		b[j + 3] = b[j + 3] - b[j + 2] * b[j + 1];//系数矩阵消元
+		d[k + 1] = d[k + 1] - b[j + 2] * d[k];
+	}
+	s = b[3 * n - 3];
+	if (fabs(s) + 1.0 == 1.0)
+	{
+		cout << "分母为0，计算有误！" << endl;
+	}
+	d[n - 1] = d[n - 1] / s;//回带，解出x(n-1)
+	for (k = n - 2; k >= 0; k--)
+	{
+		d[k] = d[k] - b[3 * k + 1] * d[k + 1];
+	}
+	
+}
+
 void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 
 {
 	/*system("mkdir result");*/
-	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_matel02.txt");//用于保存结果
+	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_matel03.txt");//用于保存结果
 	int i1 = 0;
 	int j1 = 0;
 	int k1 = 0;
@@ -85,7 +119,7 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 	{
 		if (step == 50)
 		{
-			cout << "It's Time,step =50!" << endl;
+			cout << "It's Time, step =50!" << endl;
 		}
 
 		inject_field(halfgrid_before,step);
