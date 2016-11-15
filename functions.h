@@ -1,12 +1,13 @@
-//writen by liuzhichao 
+ï»¿//writen by liuzhichao 
 //2016/10/8
+
 #ifndef _FUNCTIONS_
 #define _FUNCTIONS_
 #include "definer.h"
 #include "grid.h"
 
 
-void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)//Íø¸ñµÄ³õÊ¼»¯
+void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)//ç½‘æ ¼çš„åˆå§‹åŒ–
 {
 	for (int i = 0; i<Nx; i++)
 		for (int j = 0; j<Ny; j++)
@@ -46,7 +47,7 @@ void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 void save_result( Grid* halfgrid_now,int step)
 {
 	system("mkdir result");
-	ofstream file("result\\leapforg_ADI_FDTD_steam0.1.txt");//ÓÃÓÚ±£´æ½á¹û
+	ofstream file("result\\leapforg_ADI_FDTD_steam0.1.txt");//ç”¨äºä¿å­˜ç»“æœ
 	file << step << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ex << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ey << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ez << '\t';
 	file << step << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].bx << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].by << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].bz << '\t';
 	file << '\n';
@@ -60,61 +61,61 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 	//delete grid_result;
 }
 
-void inject_field(Grid* halfgrid_before,int step)//¼ÆËã¼¤ÀøÔ´//
+void inject_field(Grid* halfgrid_before,int step)//è®¡ç®—æ¿€åŠ±æº//
 {
-	int i =0,j =100, k=50;//¼ÓµãÔ´µÄÎ»ÖÃ//
+	int i =0,j =100, k=50;//åŠ ç‚¹æºçš„ä½ç½®//
 	//double k0 = omega*sqrt(mur0*epsl0);
 	//double kc = pi/Y ;
 	//double bate = sqrt(k0*k0-kc*kc);
-	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100ÎªÉèÖÃÖµ//
+	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100ä¸ºè®¾ç½®å€¼//
 }
 
-void trade(double*b, int n, int m, double*d)
-{
-	double s = 0;
-	int j, k;
-	if (m != 3 * n - 2)//Ê×ÏÈÅĞ¶ÏÊÇ·ñÂú×ãÈı¶Ô½Ç¾ØÕóµÄ½á¹¹Ìõ¼ş
-	{
-		cout << "¾ØÕó²»Âú×ãÈı¶Ô½Ç¾ØÕóµÄÌõ¼ş£¡" << endl;
-	}
-	for (int k = 0; k <= n - 2; k++)
-	{
-		int j = k * 3;
-		double s = b[j];
-		if (fabs(s) + 1.0 == 1.0)//fabs()º¯ÊıÊÇÇó¸¡µãÊıµÄ¾ø¶ÔÖµ£¬·µ»ØÀàĞÍÎªdouble
-		{
-			cout << "·ÖÄ¸Îª0¡¢¼ÆËã´íÎó£¡" << endl;
-		}
-		b[j + 1] = b[j + 1] / s;//ÏµÊı¾ØÕó¹éÒ»»¯
-		d[k] = d[k] / s;//³£ÊıÏòÁ¿¹éÒ»»¯
-		b[j + 3] = b[j + 3] - b[j + 2] * b[j + 1];//ÏµÊı¾ØÕóÏûÔª
-		d[k + 1] = d[k + 1] - b[j + 2] * d[k];
-	}
-	s = b[3 * n - 3];
-	if (fabs(s) + 1.0 == 1.0)
-	{
-		cout << "·ÖÄ¸Îª0£¬¼ÆËãÓĞÎó£¡" << endl;
-	}
-	d[n - 1] = d[n - 1] / s;//»Ø´ø£¬½â³öx(n-1)
-	for (k = n - 2; k >= 0; k--)
-	{
-		d[k] = d[k] - b[3 * k + 1] * d[k + 1];
-	}
-	
-}
+//void trade(double*b, int n, int m, double*d)
+//{
+//	double s = 0;
+//	int j, k;
+//	if (m != 3 * n - 2)//é¦–å…ˆåˆ¤æ–­æ˜¯å¦æ»¡è¶³ä¸‰å¯¹è§’çŸ©é˜µçš„ç»“æ„æ¡ä»¶
+//	{
+//		cout << "çŸ©é˜µä¸æ»¡è¶³ä¸‰å¯¹è§’çŸ©é˜µçš„æ¡ä»¶ï¼" << endl;
+//	}
+//	for (int k = 0; k <= n - 2; k++)
+//	{
+//		int j = k * 3;
+//		double s = b[j];
+//		if (fabs(s) + 1.0 == 1.0)//fabs()å‡½æ•°æ˜¯æ±‚æµ®ç‚¹æ•°çš„ç»å¯¹å€¼ï¼Œè¿”å›ç±»å‹ä¸ºdouble
+//		{
+//			cout << "åˆ†æ¯ä¸º0ã€è®¡ç®—é”™è¯¯ï¼" << endl;
+//		}
+//		b[j + 1] = b[j + 1] / s;//ç³»æ•°çŸ©é˜µå½’ä¸€åŒ–
+//		d[k] = d[k] / s;//å¸¸æ•°å‘é‡å½’ä¸€åŒ–
+//		b[j + 3] = b[j + 3] - b[j + 2] * b[j + 1];//ç³»æ•°çŸ©é˜µæ¶ˆå…ƒ
+//		d[k + 1] = d[k + 1] - b[j + 2] * d[k];
+//	}
+//	s = b[3 * n - 3];
+//	if (fabs(s) + 1.0 == 1.0)
+//	{
+//		cout << "åˆ†æ¯ä¸º0ï¼Œè®¡ç®—æœ‰è¯¯ï¼" << endl;
+//	}
+//	d[n - 1] = d[n - 1] / s;//å›å¸¦ï¼Œè§£å‡ºx(n-1)
+//	for (k = n - 2; k >= 0; k--)
+//	{
+//		d[k] = d[k] - b[3 * k + 1] * d[k + 1];
+//	}
+//	
+//}
 
 void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 
 {
 	/*system("mkdir result");*/
-	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_matel03.txt");//ÓÃÓÚ±£´æ½á¹û
+	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_matel03.txt");//ç”¨äºä¿å­˜ç»“æœ
 	int i1 = 0;
 	int j1 = 0;
 	int k1 = 0;
-	//*******¼ÆËãTE10Ä£******//×¢Òâ±ß½çÌõ¼şµÄÎÊÌâ£¬²»´¦ÀíÖÜÎ§µÄËÄ¸öÃæ
-	//PART1---- ¼ÆËãµç³¡//
+	//*******è®¡ç®—TE10æ¨¡******//æ³¨æ„è¾¹ç•Œæ¡ä»¶çš„é—®é¢˜ï¼Œä¸å¤„ç†å‘¨å›´çš„å››ä¸ªé¢
+	//PART1---- è®¡ç®—ç”µåœº//
 
-	int step = 0;//¼ÆËãÊ±¼ä²½³¤
+	int step = 0;//è®¡ç®—æ—¶é—´æ­¥é•¿
 	while(step< STEPS)
 	{
 		if (step == 50)
@@ -134,7 +135,7 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 			{
 				cout << "Now" << endl;
 			}
-			if (i == 0)//×ó±ß½ç£¬ĞÅºÅÔ´´¦
+			if (i == 0)//å·¦è¾¹ç•Œï¼Œä¿¡å·æºå¤„
 			{
 				i1 = 1;
 			}
@@ -152,7 +153,7 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 			double tx2 =  ( halfgrid_before[i*Ny*Nz + j*Nz + k].bx-halfgrid_before[i*Ny*Nz + (j1-1)*Nz + k].bx )/dy;
 			halfgrid_now[ i*Ny*Nz + j*Nz + k].ez = halfgrid_before[ i*Ny*Nz + j*Nz + k].ez + dt*(1/epsl_z)*( ty2 - tx2 );
 
-			halfgrid_before[ i*Ny*Nz + j*Nz + k].ex = halfgrid_now[ i*Ny*Nz + j*Nz + k].ex;//±£´æÎªÇ°Ò»²½½á¹û
+			halfgrid_before[ i*Ny*Nz + j*Nz + k].ex = halfgrid_now[ i*Ny*Nz + j*Nz + k].ex;//ä¿å­˜ä¸ºå‰ä¸€æ­¥ç»“æœ
 			halfgrid_before[ i*Ny*Nz + j*Nz + k].ey =  halfgrid_now[i*Ny*Nz + j*Nz + k].ey;
 			halfgrid_before[i*Ny*Nz + j*Nz + k].ez  = halfgrid_now[i*Ny*Nz + j*Nz + k].ez;
 
@@ -169,12 +170,12 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 			double ty5 = (halfgrid_before[(i + 1)*Ny*Nz + j*Nz + k].ey - halfgrid_before[i*Ny*Nz + j*Nz + k].ey) / dx;
 			halfgrid_now[i*Ny*Nz + j*Nz + k].bz = halfgrid_before[i*Ny*Nz + j*Nz + k].bz + dt*(1 / mur_z)*(tx5 - ty5);
 
-			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//±£´æÎªÇ°Ò»²½½á¹û
+			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//ä¿å­˜ä¸ºå‰ä¸€æ­¥ç»“æœ
 			halfgrid_before[i*Ny*Nz + j*Nz + k].by = halfgrid_now[i*Ny*Nz + j*Nz + k].by;
 			halfgrid_before[i*Ny*Nz + j*Nz + k].bz = halfgrid_now[i*Ny*Nz + j*Nz + k].bz;
 			
 			
-//PART2----¼ÆËã´Å³¡//
+//PART2----è®¡ç®—ç£åœº//
 	//for(int i = 0; i<Nx-1;i++)
 	//	for(int j =0; j<Ny-1; j++)
 	//		for (int k = 0; k < Nz-1; k++)
@@ -192,27 +193,27 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 	//			double ty5 =  (halfgrid_before[ (i+1)*Ny*Nz + j*Nz + k].ey - halfgrid_before[ i*Ny*Nz + j*Nz + k].ey )/dx;
 	//			halfgrid_now[ i*Ny*Nz + j*Nz + k].bz = halfgrid_before[ i*Ny*Nz + j*Nz + k].bz + dt*(1/ mur_z )*( tx5 - ty5 );			
 
-	//			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//±£´æÎªÇ°Ò»²½½á¹û
+	//			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//ä¿å­˜ä¸ºå‰ä¸€æ­¥ç»“æœ
  //               halfgrid_before[ i*Ny*Nz + j*Nz + k].by =  halfgrid_now[i*Ny*Nz + j*Nz + k].by;
 	//			halfgrid_before[ i*Ny*Nz + j*Nz + k].bz  = halfgrid_now[ i*Ny*Nz + j*Nz + k].bz;
 			}
 								
-	////ÈôÈ¡Æ½¾ù£¬ÔòÍø¸ñµã´¦µÄµç´Å³¡¼ÆËãÈçÏÂ
+	////è‹¥å–å¹³å‡ï¼Œåˆ™ç½‘æ ¼ç‚¹å¤„çš„ç”µç£åœºè®¡ç®—å¦‚ä¸‹
 	//
 	//for(int i = 0; i<Nx-1;i++)
 	//	for(int j =0; j<Ny-1; j++)
 	//		for (int k = 0; k < Nz-1; k++)
 	//		{
-	//			  if(i == 0 )//×ó±ß½ç£¬ĞÅºÅÔ´´¦
+	//			  if(i == 0 )//å·¦è¾¹ç•Œï¼Œä¿¡å·æºå¤„
 	//			 {
 	//				
 	//			 }
 	//		           
-	//		     if(i== Nx - 1 )//ÓÒ±ß½ç£¬ÎüÊÕ±ß½ç
+	//		     if(i== Nx - 1 )//å³è¾¹ç•Œï¼Œå¸æ”¶è¾¹ç•Œ
 	//			 {
 	//				
 	//			 }
-	//			 if(k == Nz - 1|| k==0 || j==Ny - 1 || j==0 )//ËÄ¸öÆ½Ãæ
+	//			 if(k == Nz - 1|| k==0 || j==Ny - 1 || j==0 )//å››ä¸ªå¹³é¢
 	//			 {
 	//				 
 	//			 }
@@ -238,24 +239,24 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 	cout<<"Step--- "<<step<<" ---has finished."<<endl;
  }//while
 
-}//º¯Êı½áÎ²
+}//å‡½æ•°ç»“å°¾
 
 void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	/*system("mkdir result");*/
-	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_mur02.txt");//ÓÃÓÚ±£´æ½á¹û
-	//*******¼ÆËãTE10Ä£******//×¢Òâ±ß½çÌõ¼şµÄÎÊÌâ,Ö±½ÓÈ«²¿Ê¹ÓÃ¶ş½×murÎüÊÕ±ß½ç»¹ÊÇ»á³öÏÖÎÊÌâ£¬ÒòÎªÓĞÀâ±ßµÄ´æÔÚ£¬ÏÖÔÚ²ÉÓÃÔÚÀâ±ß´¦Ê¹ÓÃÒ»½×ÎüÊÕ±ß½çÌõ¼ş£¬±ÜÃâÊ¹ÓÃÀâ±ß
+	ofstream file("result\\leapforg_ADI_FDTD_steam0.1_mur02.txt");//ç”¨äºä¿å­˜ç»“æœ
+	//*******è®¡ç®—TE10æ¨¡******//æ³¨æ„è¾¹ç•Œæ¡ä»¶çš„é—®é¢˜,ç›´æ¥å…¨éƒ¨ä½¿ç”¨äºŒé˜¶murå¸æ”¶è¾¹ç•Œè¿˜æ˜¯ä¼šå‡ºç°é—®é¢˜ï¼Œå› ä¸ºæœ‰æ£±è¾¹çš„å­˜åœ¨ï¼Œç°åœ¨é‡‡ç”¨åœ¨æ£±è¾¹å¤„ä½¿ç”¨ä¸€é˜¶å¸æ”¶è¾¹ç•Œæ¡ä»¶ï¼Œé¿å…ä½¿ç”¨æ£±è¾¹
 
-	int step = 0;//¼ÆËãÊ±¼ä²½³¤
+	int step = 0;//è®¡ç®—æ—¶é—´æ­¥é•¿
 	while (step< STEPS)
 	{
 		inject_field(halfgrid_before, step);
-		//PART1---- ¼ÆËãµç³¡//
+		//PART1---- è®¡ç®—ç”µåœº//
 		for (int i = 0; i<Nx - 1; i++)
 			for (int j = 1; j<Ny - 2; j++)
 				for (int k = 1; k<Nz - 2; k++)
 				{
-			if (i == 0)//×ó±ß½ç£¬ĞÅºÅÔ´´¦,Ò»½×murÎüÊÕ±ß½ç´¦ÀíÀâ±ß			
+			if (i == 0)//å·¦è¾¹ç•Œï¼Œä¿¡å·æºå¤„,ä¸€é˜¶murå¸æ”¶è¾¹ç•Œå¤„ç†æ£±è¾¹			
 			{
 				/*if (j == 0)
 				{
@@ -301,7 +302,7 @@ void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* 
 				//}
 
 			}
-			else if (i == Nx - 1)//ÓÒ±ß½ç£¬ĞÅºÅÔ´´¦
+			else if (i == Nx - 1)//å³è¾¹ç•Œï¼Œä¿¡å·æºå¤„
 			{
 					/*if (j == 0)
 					{
@@ -555,17 +556,17 @@ void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* 
 				halfgrid_now[i*Ny*Nz + j*Nz + k].ez = halfgrid_before[i*Ny*Nz + j*Nz + k].ez + dt*(1 / epsl_z)*(ty2 - tx2);
 
 			}//else
-			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ex = halfgrid_before[i*Ny*Nz + j*Nz + k].ex;//±£´æÉÏÉÏ²½µÄ½á¹û
+			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ex = halfgrid_before[i*Ny*Nz + j*Nz + k].ex;//ä¿å­˜ä¸Šä¸Šæ­¥çš„ç»“æœ
 			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ey = halfgrid_before[i*Ny*Nz + j*Nz + k].ey;
 			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ez = halfgrid_before[i*Ny*Nz + j*Nz + k].ez;
 
 
-			halfgrid_before[i*Ny*Nz + j*Nz + k].ex = halfgrid_now[i*Ny*Nz + j*Nz + k].ex;//±£´æÇ°Ò»²½½á¹û
+			halfgrid_before[i*Ny*Nz + j*Nz + k].ex = halfgrid_now[i*Ny*Nz + j*Nz + k].ex;//ä¿å­˜å‰ä¸€æ­¥ç»“æœ
 			halfgrid_before[i*Ny*Nz + j*Nz + k].ey = halfgrid_now[i*Ny*Nz + j*Nz + k].ey;
 			halfgrid_before[i*Ny*Nz + j*Nz + k].ez = halfgrid_now[i*Ny*Nz + j*Nz + k].ez;
 				}
 
-		//PART2----¼ÆËã´Å³¡//
+		//PART2----è®¡ç®—ç£åœº//
 		for (int i = 0; i<Nx - 1; i++)
 			for (int j = 0; j<Ny - 1; j++)
 				for (int k = 0; k < Nz - 1; k++)
@@ -584,31 +585,31 @@ void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* 
 			double ty5 = (halfgrid_before[(i + 1)*Ny*Nz + j*Nz + k].ey - halfgrid_before[i*Ny*Nz + j*Nz + k].ey) / dx;
 			halfgrid_now[i*Ny*Nz + j*Nz + k].bz = halfgrid_before[i*Ny*Nz + j*Nz + k].bz + dt*(1 / mur_z)*(tx5 - ty5);
 
-			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].bx = halfgrid_before[i*Ny*Nz + j*Nz + k].bx;//±£´æÉÏÉÏ²½µÄ½á¹û
+			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].bx = halfgrid_before[i*Ny*Nz + j*Nz + k].bx;//ä¿å­˜ä¸Šä¸Šæ­¥çš„ç»“æœ
 			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].by = halfgrid_before[i*Ny*Nz + j*Nz + k].by;
 			halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].bz = halfgrid_before[i*Ny*Nz + j*Nz + k].bz;
 
-			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//±£´æÎªÇ°Ò»²½½á¹û
+			halfgrid_before[i*Ny*Nz + j*Nz + k].bx = halfgrid_now[i*Ny*Nz + j*Nz + k].bx;//ä¿å­˜ä¸ºå‰ä¸€æ­¥ç»“æœ
 			halfgrid_before[i*Ny*Nz + j*Nz + k].by = halfgrid_now[i*Ny*Nz + j*Nz + k].by;
 			halfgrid_before[i*Ny*Nz + j*Nz + k].bz = halfgrid_now[i*Ny*Nz + j*Nz + k].bz;
 				}
 
-		////ÈôÈ¡Æ½¾ù£¬ÔòÍø¸ñµã´¦µÄµç´Å³¡¼ÆËãÈçÏÂ
+		////è‹¥å–å¹³å‡ï¼Œåˆ™ç½‘æ ¼ç‚¹å¤„çš„ç”µç£åœºè®¡ç®—å¦‚ä¸‹
 		//
 		//for(int i = 0; i<Nx;i++)
 		//	for(int j =0; j<Ny; j++)
 		//		for (int k = 0; k < Nz; k++)
 		//		{
-		//			  if(i == 0 )//×ó±ß½ç£¬ĞÅºÅÔ´´¦
+		//			  if(i == 0 )//å·¦è¾¹ç•Œï¼Œä¿¡å·æºå¤„
 		//			 {
 		//				
 		//			 }
 		//		           
-		//		     if(i== Nx - 1 )//ÓÒ±ß½ç£¬ÎüÊÕ±ß½ç
+		//		     if(i== Nx - 1 )//å³è¾¹ç•Œï¼Œå¸æ”¶è¾¹ç•Œ
 		//			 {
 		//				
 		//			 }
-		//			 if(k == Nz - 1|| k==0 || j==Ny - 1 || j==0 )//ËÄ¸öÆ½Ãæ
+		//			 if(k == Nz - 1|| k==0 || j==Ny - 1 || j==0 )//å››ä¸ªå¹³é¢
 		//			 {
 		//				 
 		//			 }
@@ -634,7 +635,7 @@ void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* 
 		cout << "Step--- " << step << " ---has finished." << endl;
 	}//while
 
-}//º¯Êı½áÎ²
+}//å‡½æ•°ç»“å°¾
 
 
 #endif

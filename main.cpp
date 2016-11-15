@@ -4,7 +4,6 @@
 #include "grid.h"
 #include "functions.h"
 
-
 int main()
 {
 	clock_t start_time = clock();

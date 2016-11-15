@@ -1,25 +1,24 @@
-//writen by liuzhichao 
+ï»¿//writen by liuzhichao 
 //2016/10/8
 #ifndef _GRID_
 #define _GRID_
 #include"definer.h"
-
 class Grid	
 {
 public:
-    double ex,ey,ez;//µç³¡Ç¿¶È
-	double bx,by,bz;//´Å³¡Ç¿¶È
+    double ex,ey,ez;//ç”µåœºå¼ºåº¦
+	double bx,by,bz;//ç£åœºå¼ºåº¦
 	
 };
-//¶ÔÏóÍ³Ò»ÉèÎªÒ»Î¬µÄÊı×é£¬·½±ãºó±ß²¢ĞĞ»¯
-Grid* halfgrid_now = new  Grid[Nx*Ny*Nz]; //°ëÕûÊıÍø¸ñµãÏÖÔÚÊ±¿Ì
-Grid* halfgrid_before = new Grid[Nx*Ny*Nz];//°ëÕûÊıÍø¸ñµã¹ıÈ¥Ê±¿Ì
-Grid* halfgrid_beforeX2 = new  Grid[Nx*Ny*Nz];//°ëÕûÊıÍø¸ñµã¹ıÈ¥µÄ¹ıÈ¥Ê±¿Ì,murÎüÊÕ±ß½çÒªÓÃ
-//Grid* grid_result = new Grid[Nx*Ny*Nz];//×îÖÕÍø¸ñÖĞ³¡µÄ½á¹û
+//å¯¹è±¡ç»Ÿä¸€è®¾ä¸ºä¸€ç»´çš„æ•°ç»„ï¼Œæ–¹ä¾¿åè¾¹å¹¶è¡ŒåŒ–
+Grid* halfgrid_now = new  Grid[Nx*Ny*Nz]; //åŠæ•´æ•°ç½‘æ ¼ç‚¹ç°åœ¨æ—¶åˆ»
+Grid* halfgrid_before = new Grid[Nx*Ny*Nz];//åŠæ•´æ•°ç½‘æ ¼ç‚¹è¿‡å»æ—¶åˆ»
+Grid* halfgrid_beforeX2 = new  Grid[Nx*Ny*Nz];//åŠæ•´æ•°ç½‘æ ¼ç‚¹è¿‡å»çš„è¿‡å»æ—¶åˆ»,murå¸æ”¶è¾¹ç•Œè¦ç”¨
+//Grid* grid_result = new Grid[Nx*Ny*Nz];//æœ€ç»ˆç½‘æ ¼ä¸­åœºçš„ç»“æœ
 
-//Grid halfgrid_now[Ny*Nz*Nz]; //°ëÕûÊıÍø¸ñµãÏÖÔÚÊ±¿Ì
-//Grid halfgrid_before[Ny*Nz*Nz];//°ëÕûÊıÍø¸ñµã¹ıÈ¥Ê±¿Ì
-//Grid grid_result[Ny*Nz*Nz];//×îÖÕÍø¸ñÖĞ³¡½á¹û
+//Grid halfgrid_now[Ny*Nz*Nz]; //åŠæ•´æ•°ç½‘æ ¼ç‚¹ç°åœ¨æ—¶åˆ»
+//Grid halfgrid_before[Ny*Nz*Nz];//åŠæ•´æ•°ç½‘æ ¼ç‚¹è¿‡å»æ—¶åˆ»
+//Grid grid_result[Ny*Nz*Nz];//æœ€ç»ˆç½‘æ ¼ä¸­åœºç»“æœ
 
 
 

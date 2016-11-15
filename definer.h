@@ -1,8 +1,9 @@
-//writen by liuzhichao 
+ï»¿//writen by liuzhichao 
 //2016/10/8
-// i-1/2 ---> i-1;    i+1/2---> i;   i+1---> i+1°ëÍø¸ñµãµÄ¶ÔÓ¦·½Ê½
+// i-1/2 ---> i-1;    i+1/2---> i;   i+1---> i+1åŠç½‘æ ¼ç‚¹çš„å¯¹åº”æ–¹å¼
 #ifndef _DEFINER_
 #define _DEFINER_
+
 
 #include<cstdio>
 #include <iostream>
@@ -12,33 +13,34 @@
 #include <math.h>
 #include <time.h>
 #include<windows.h>
+
 using namespace std;
-//ÒªÇóÊ¹ÓÃTE10Ä£Ê½×÷ÎªÇ¿ÆÈĞÔ¼¤ÀøÔ´
+//è¦æ±‚ä½¿ç”¨TE10æ¨¡å¼ä½œä¸ºå¼ºè¿«æ€§æ¿€åŠ±æº
 
-const double X = 0.1; //µ¥Î»m£¬²¨µ¼³¤¶È£¬ÔİÇÒÉèÖÃµÄ½Ï³¤ÒÔ±ã¹Û²ìÊı¾İ
-const double Y = 0.02286; //µ¥Î»m£¬²¨µ¼¿í¶È£¬ÒÀ¾İBJ100±ê×¼¿í¶È
-const double Z = 0.01016; //µ¥Î»m, ²¨µ¼¸ß¶È£¬ÒÀ¾İBJ100±ê×¼¸ß¶È
+const double X = 0.1; //å•ä½mï¼Œæ³¢å¯¼é•¿åº¦ï¼Œæš‚ä¸”è®¾ç½®çš„è¾ƒé•¿ä»¥ä¾¿è§‚å¯Ÿæ•°æ®
+const double Y = 0.02286; //å•ä½mï¼Œæ³¢å¯¼å®½åº¦ï¼Œä¾æ®BJ100æ ‡å‡†å®½åº¦
+const double Z = 0.01016; //å•ä½m, æ³¢å¯¼é«˜åº¦ï¼Œä¾æ®BJ100æ ‡å‡†é«˜åº¦
 
-const int Nx = 501; //³¤¶È·½ÏòÍø¸ñÊı
-const int Ny = 201;//¿í¶È·½ÏòÍø¸ñÊı
-const int Nz = 101;//¸ß¶È·½ÏòÍø¸ñÊı
+const int Nx = 501; //é•¿åº¦æ–¹å‘ç½‘æ ¼æ•°
+const int Ny = 201;//å®½åº¦æ–¹å‘ç½‘æ ¼æ•°
+const int Nz = 101;//é«˜åº¦æ–¹å‘ç½‘æ ¼æ•°
 
-const double  dx = 2e-4; //l·½Ïò¿Õ¼ä²½³¤
-const double dy = 1.143e-4; //w·½Ïò¿Õ¼ä²½³¤
-const double dz = 1.1016e-4; //h·½Ïò¿Õ¼ä²½³¤
+const double  dx = 2e-4; //læ–¹å‘ç©ºé—´æ­¥é•¿
+const double dy = 1.143e-4; //wæ–¹å‘ç©ºé—´æ­¥é•¿
+const double dz = 1.1016e-4; //hæ–¹å‘ç©ºé—´æ­¥é•¿
 
-const double dt = 1.0e-14; // Ê±¼ä²½³¤
-const int STEPS = 12000; //¼ÆËã6000¸öÊ±¼ä²½³¤µÄÊı¾İ
+const double dt = 1.0e-14; // æ—¶é—´æ­¥é•¿
+const int STEPS = 12000; //è®¡ç®—6000ä¸ªæ—¶é—´æ­¥é•¿çš„æ•°æ®
 
-const double freq = 9e9; //ÈëÉä³¡ÆµÂÊ
+const double freq = 9e9; //å…¥å°„åœºé¢‘ç‡
 const double pi = 3.1415926;
 const double c = 2.99792458e8;
-const double omega = 2 * pi*freq;//½ÇËÙ¶È//
+const double omega = 2 * pi*freq;//è§’é€Ÿåº¦//
 
-const double epsl0 = 8.854e-12;//×ÔÓÉ¿Õ¼ä½éµç³£Êı
-const double mur0 = 4.0*pi*1.0e-7;//×ÔÓÉ¿Õ¼äµ¼´ÅÂÊ
-const double  k0 = omega*sqrt(mur0*epsl0);//×ÔÓÉ¿Õ¼ä²¨Êı//
-const double kc = pi / Y; //TE10Ä£½ØÖ¹²¨Êı//
+const double epsl0 = 8.854e-12;//è‡ªç”±ç©ºé—´ä»‹ç”µå¸¸æ•°
+const double mur0 = 4.0*pi*1.0e-7;//è‡ªç”±ç©ºé—´å¯¼ç£ç‡
+const double  k0 = omega*sqrt(mur0*epsl0);//è‡ªç”±ç©ºé—´æ³¢æ•°//
+const double kc = pi / Y; //TE10æ¨¡æˆªæ­¢æ³¢æ•°//
 
 
 const double epsl_x = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dy * dy)));
@@ -50,5 +52,25 @@ const double mur_y = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dz * dz)));
 const double mur_z = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dx * dx)));
 
 
+class GSS
+{
+public:
+	int nRet = 0;//GSSå‡½æ•°çš„è¿”å›å€¼
+	int N = Ny;
+	int nnz = 3 * N - 2;
+	int nRow = N;
+	int nCol = N;
+
+	int ptr[Ny + 1];
+	int ind[3 * Ny - 2];
+	double val[3 * Ny - 2];
+	double rhs[Ny];
+
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
+	double setting[32];
+	//for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
+	int type = 0;
+
+};
 
 #endif
