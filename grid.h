@@ -20,13 +20,4 @@ Grid* halfgrid_beforeX2 = new  Grid[Nx*Ny*Nz];//半整数网格点过去的过�
 //Grid halfgrid_before[Ny*Nz*Nz];//半整数网格点过去时刻
 //Grid grid_result[Ny*Nz*Nz];//最终网格中场结果
 
-
-
-
-
-
-
-
-
-
 #endif

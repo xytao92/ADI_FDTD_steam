@@ -30,7 +30,7 @@ const double dy = 1.143e-4; //w方向空间步长
 const double dz = 1.1016e-4; //h方向空间步长
 
 const double dt = 1.0e-14; // 时间步长
-const int STEPS = 12000; //计算6000个时间步长的数据
+const int STEPS = 6000; //计算6000个时间步长的数据
 
 const double freq = 9e9; //入射场频率
 const double pi = 3.1415926;

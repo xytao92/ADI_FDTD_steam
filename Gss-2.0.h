@@ -32,6 +32,8 @@ val[7]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
 Copyright (c) 2005-present by YingShiChen.    All Rights Reserved.
 Any problem,contact gsp@grusoft.com
 */
+//#ifndef _GSS_2_0_
+//#define _GSS_2_0_
 
 #include <time.h>
 #include <stdio.h>
@@ -39,12 +41,15 @@ Any problem,contact gsp@grusoft.com
 #include <math.h>
 
 #define GSS_6_IMPORT __declspec(dllimport)		//申明下列函数从DLL库引入
-
+#pragma comment( lib, "GSS_DLL_6D.lib")
 #ifdef __cplusplus
 extern "C" {
-#endif
-	#define GRUS_MF_STATUS			0	
-	#define GRUS_OK					0
+#endif   //让编译器采用C语言编译，防止的是C语言和C++语言的混合编译出现问题
+//不用会出现这种错：错误	5	error LNK2019: 无法解析的外部符号 __imp__GSS_clear_ld，
+//该符号在函数 "void __cdecl matel_gsscalc_bx(class Grid *,class Grid *)" (?matel_gsscalc_bx@@YAXPAVGrid@@0@Z) 中被引用...这是什么函数名，喂！
+
+#define GRUS_MF_STATUS	0	
+#define GRUS_OK	0
 
 /*
 	初始化
@@ -111,5 +116,5 @@ GSS_6_IMPORT	int GSS_clear_ld( void* hSolver );
 #ifdef __cplusplus
 }
 #endif
-
-
+#pragma comment( lib, "GSS_DLL_6D.lib")
+//#endif

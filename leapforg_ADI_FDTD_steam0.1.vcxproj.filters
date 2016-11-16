@@ -27,6 +27,9 @@
     <ClInclude Include="Gss-2.0.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GSS_ADI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
