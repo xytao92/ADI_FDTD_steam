@@ -63,7 +63,7 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 
 void inject_field(Grid* halfgrid_before,int step)//计算激励源//
 {
-	int i =0,j =100, k=50;//加点源的位置//
+	int i =0,j =10, k=5;//加点源的位置//
 	//double k0 = omega*sqrt(mur0*epsl0);
 	//double kc = pi/Y ;
 	//double bate = sqrt(k0*k0-kc*kc);
