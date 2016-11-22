@@ -1,3 +1,9 @@
+/*
+Writen By LiuZhiChao 
+on time: 2016.11.22
+All Rights Receved
+*/
+
 #ifndef _GSS_ADI_
 #define _GSS_ADI_
 
@@ -5,7 +11,7 @@
 #include "grid.h"
 #include"functions.h"
 #include"Gss-2.0.h"
-
+//-----------------------------------------------------------------------函数声明
 void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now);
 void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now);
 void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now);
@@ -29,6 +35,8 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 
 		inject_field(halfgrid_before, step);
 		//---------------------------------------------------------------------------------------计算电场
+		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
+
 		matel_gsscalc_ex(halfgrid_before, halfgrid_now);
 		matel_gsscalc_ey(halfgrid_before, halfgrid_now);
 		matel_gsscalc_ez(halfgrid_before, halfgrid_now);
@@ -181,7 +189,10 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now)
 		}
 
 	}
-
+	free(ptr);//不释放的话内存不够，GSS_clear_ld没有释放这块内存
+	free(ind);
+	free(val);
+	free(rhs);
 	
 }
 
@@ -289,12 +300,16 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now)
 				halfgrid_now[i*Ny*Nz + j*Nz + k1].ey = rhs[k1];
 				halfgrid_before[i*Ny*Nz + j*Nz + k1].ey = halfgrid_now[i*Ny*Nz + j*Nz + k1].ey;
 			}
+
+			if (hSolver != NULL)	
+				GSS_clear_ld(hSolver);
 		}
 	}
-		
+	free(ptr);
+	free(ind);
+	free(val);
+	free(rhs);
 
-	if (hSolver != NULL)
-		GSS_clear_ld(hSolver);
 }
 
 void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now)
@@ -400,13 +415,15 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now)
 				halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = rhs[i1];
 				halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = halfgrid_now[i1*Ny*Nz + j*Nz + k].ez;
 			}
+
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
-	
 		}
 	}
-			
-	
+	free(ptr);
+	free(ind);
+	free(val);
+	free(rhs);
 }
 
 
@@ -507,12 +524,15 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now)
 				halfgrid_now[i*Ny*Nz + j1*Nz + k].bx = rhs[j1];
 				halfgrid_before[i*Ny*Nz + j1*Nz + k].bx = halfgrid_now[i*Ny*Nz + j1*Nz + k].bx;
 			}
+
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
-
 		}
 	}
-
+	free(ptr);
+	free(ind);
+	free(val);
+	free(rhs);
 }
 
 void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now)
@@ -613,11 +633,15 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now)
 				halfgrid_now[i*Ny*Nz + j*Nz + k1].by = rhs[k1];
 				halfgrid_before[i*Ny*Nz + j*Nz + k1].by = halfgrid_now[i*Ny*Nz + j*Nz + k1].by;
 			}
+
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
 	}
-
+	free(ptr);
+	free(ind);
+	free(val);
+	free(rhs);
 }
 
 void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now)
@@ -717,13 +741,15 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now)
 				halfgrid_now[i1*Ny*Nz + j*Nz + k].bz = rhs[i1];
 				halfgrid_before[i1*Ny*Nz + j*Nz + k].bz = halfgrid_now[i1*Ny*Nz + j*Nz + k].bz;
 			}
+
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
-		
 		}
 	}
-
-	
+	free(ptr);
+	free(ind);
+	free(val);
+	free(rhs);
 }
 
 #endif
