@@ -46,7 +46,7 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 		matel_gsscalc_by(halfgrid_before, halfgrid_now,step);
 	    matel_gsscalc_bz(halfgrid_before, halfgrid_now,step);
 
-		int result_x = 25;
+		int result_x = 0;
 		int result_y = 10;
 		int result_z = 5;
 		
@@ -163,7 +163,7 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				return;
 			}
 
-				hSolver = GSS_symbol_ld(nRow, nCol, ptr, ind, val);
+			hSolver = GSS_symbol_ld(nRow, nCol, ptr, ind, val);
 			if (hSolver == NULL)	{
 				printf("\tERROR at SYMBOLIC ANALYSIS.\r\n");
 				exit(0);
@@ -408,21 +408,20 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			for (int i1 = 0; i1 < Nx-1; i1++)
 			{//保存结果
-				
-				halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = rhs[i1];
-
-				halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = halfgrid_now[i1*Ny*Nz + j*Nz + k].ez;
-			}
-
-			for (int j0 = 0; j < Ny - 1; j++)
+				if (i1 == 0)
 				{
-					for (int k0 = 0; k < Nz - 1; k++)
-					{
-						halfgrid_before[j0*Nz + k0].ez = 100 * sin((pi / Y)*j0*dy)*sin(omega*step*dt);//100为设置值//115
-						halfgrid_now[j0*Nz + k0].ez = 100 * sin((pi / Y)*j0*dy)*sin(omega*step*dt);//100为设置值//115
-					}
+					//halfgrid_before[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
+					halfgrid_now[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
 				}
+				else
+				{
+					halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = rhs[i1];
 
+				     halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = halfgrid_now[i1*Ny*Nz + j*Nz + k].ez;
+				}
+				
+			}
+					
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
