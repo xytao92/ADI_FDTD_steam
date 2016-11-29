@@ -3,9 +3,9 @@
 #ifndef _GRID_
 #define _GRID_
 #include"definer.h"
-class Grid	
+struct Grid	
 {
-public:
+
     double ex,ey,ez;//电场强度
 	double bx,by,bz;//磁场强度
 	

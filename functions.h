@@ -61,13 +61,14 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 	//delete grid_result;
 }
 
-void inject_field(Grid* halfgrid_before,int step)//计算激励源//
+void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激励源//
 {
 	int i =0,j =10, k=5;//加点源的位置//
 	//double k0 = omega*sqrt(mur0*epsl0);
 	//double kc = pi/Y ;
 	//double bate = sqrt(k0*k0-kc*kc);
-	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100为设置值//
+	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100为设置值//115
+	halfgrid_now[i*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);
 }
 
 //void trade(double*b, int n, int m, double*d)
@@ -123,7 +124,7 @@ void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 			cout << "It's Time, step =50!" << endl;
 		}
 
-		inject_field(halfgrid_before,step);
+		inject_field(halfgrid_before,halfgrid_now,step);
 		for(int i = 0; i<Nx-1;i++)
 			for(int j =1; j<Ny-2; j++)
 				for (int k = 1; k<Nz-2; k++)
@@ -250,7 +251,7 @@ void adi_fdtd_leapforg_mur(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* 
 	int step = 0;//计算时间步长
 	while (step< STEPS)
 	{
-		inject_field(halfgrid_before, step);
+		inject_field(halfgrid_before,halfgrid_now, step);
 		//PART1---- 计算电场//
 		for (int i = 0; i<Nx - 1; i++)
 			for (int j = 1; j<Ny - 2; j++)

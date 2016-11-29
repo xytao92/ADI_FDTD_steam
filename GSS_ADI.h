@@ -12,19 +12,19 @@ All Rights Receved
 #include"functions.h"
 #include"Gss-2.0.h"
 //-----------------------------------------------------------------------函数声明
-void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now);
-void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now);
-void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now);
-void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now);
-void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now);
-void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now);
+void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step);
 
 void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 
 {
 	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 	system("mkdir result");
-	ofstream file("result\\GSS_matel_steam1_2.txt");//用于保存结果
+	ofstream file("result\\GSS_matel_steam1_3.txt");//用于保存结果
 
 	//*******计算TE10模******//注意边界条件的问题，不处理周围的四个面
 	//PART1---- 计算电场//
@@ -33,34 +33,32 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 	while (step < STEPS)
 	{
 
-		inject_field(halfgrid_before, step);
+		inject_field(halfgrid_before,halfgrid_now, step);
 		//---------------------------------------------------------------------------------------计算电场
 		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
 
-		matel_gsscalc_ex(halfgrid_before, halfgrid_now);
-		matel_gsscalc_ey(halfgrid_before, halfgrid_now);
-		matel_gsscalc_ez(halfgrid_before, halfgrid_now);
+		matel_gsscalc_ex(halfgrid_before, halfgrid_now,step);
+		matel_gsscalc_ey(halfgrid_before, halfgrid_now,step);
+		matel_gsscalc_ez(halfgrid_before, halfgrid_now,step);
 		
 		//---------------------------------------------------------------------------------------计算磁场
-		matel_gsscalc_bx(halfgrid_before, halfgrid_now);
-		matel_gsscalc_by(halfgrid_before, halfgrid_now);
-	    matel_gsscalc_bz(halfgrid_before, halfgrid_now);
+		matel_gsscalc_bx(halfgrid_before, halfgrid_now,step);
+		matel_gsscalc_by(halfgrid_before, halfgrid_now,step);
+	    matel_gsscalc_bz(halfgrid_before, halfgrid_now,step);
 
 		int result_x = 25;
 		int result_y = 10;
 		int result_z = 5;
-		//file << step << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].ey;
+		
 		file << step << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].ex << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].ey << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].ez << '\t';
 		file << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].bx << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].by << '\t' << halfgrid_now[result_x * Ny*Nz + result_y * Nz + result_z].bz << '\t';
 		file << '\n';
-		//save_result(halfgrid_now, step);
-		step++;
 		cout << "Step--- " << step << " ---has finished." << endl;
-
+		step++;
 	}//while
 }//函数结尾
 
-void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 	double aex = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dy)*(1 / dy));
 	double bex = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dy)*(1 / dy));
@@ -135,6 +133,7 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now)
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
     //------------------------------------------------------------生成系数矩阵
+
 	for (int i = 0; i < Nx-1; i++)
 	{
 		for (int k = 0; k < Nz-1; k++)
@@ -179,24 +178,21 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 			
-			for (int j1 = 0; j1 < Ny-1; j1++){//保存结果
+			for (int j1 = 0; j1 < Ny-1; j1++)
+			{//保存结果
 				halfgrid_now[i*Ny*Nz + j1*Nz + k].ex = rhs[j1];
 				halfgrid_before[i*Ny*Nz + j1*Nz + k].ex = halfgrid_now[i*Ny*Nz + j1*Nz + k].ex;
-
 			}
+			
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
-
+		
 	}
-	free(ptr);//不释放的话内存不够，GSS_clear_ld没有释放这块内存
-	free(ind);
-	free(val);
-	free(rhs);
 	
 }
 
-void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 
 	double aey = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dz)*(1 / dz));
@@ -254,7 +250,7 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now)
 	//-----------------------------------------------------------rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
-
+	
 	for (int i = 0; i < Nx-1; i++)
 	{
 		for (int j = 0; j < Ny-1; j++)
@@ -305,14 +301,10 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now)
 				GSS_clear_ld(hSolver);
 		}
 	}
-	free(ptr);
-	free(ind);
-	free(val);
-	free(rhs);
 
 }
 
-void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 	double aez = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
 	double bez = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
@@ -369,14 +361,17 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now)
 	//-----------------------------------------------------------rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
+	
 	for (int j = 0; j < Ny-1; j++)
 	{
 		for (int k = 0; k < Nz-1; k++)
 		{
 			for (int i = 0; i < Nx-1; i++)
 			{
+				////if ( i == 0&& j == 10&&k == 5)//加点源位置，保证不会被覆盖
+				////	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);//100为设置值//
 				//首先处理矩阵方程的右端项rhs数组
-				if (i == 0 && j != 0)
+			     if (i == 0 && j != 0)
 					rhs[i] =  bez*halfgrid_before[i*Ny*Nz + j*Nz + k].ez + cez*halfgrid_before[(i + 1)*Ny*Nz + j*Nz + k].ez
 					+ dt*((halfgrid_before[i*Ny*Nz + j*Nz + k].by) / dx - (halfgrid_before[i*Ny*Nz + j*Nz + k].bx - halfgrid_before[i*Ny*Nz + (j - 1)*Nz + k].bx) / dy);
 				else if (j == 0 && i != 0)
@@ -411,23 +406,29 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
-			for (int i1 = 0; i1 < Nx-1; i1++){//保存结果
+			for (int i1 = 0; i1 < Nx-1; i1++)
+			{//保存结果
+				
 				halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = rhs[i1];
+
 				halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = halfgrid_now[i1*Ny*Nz + j*Nz + k].ez;
+
+				if (i1 == 0 && j == 10 && k == 5)//加点源位置，保证不会被覆盖
+				{
+					halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);//100为设置值//
+					halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);
+				}
 			}
 
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
 	}
-	free(ptr);
-	free(ind);
-	free(val);
-	free(rhs);
+	
 }
 
 
-void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 	double ahx = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dy)*(1 / dy));
 	double bhx = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dy)*(1 / dy));
@@ -484,6 +485,7 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now)
 	//-----------------------------------------------------------rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
+	
 	for (int i = 0; i < Nx-1; i++)
 	{
 		for (int k = 0; k < Nz-1; k++)
@@ -529,13 +531,10 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now)
 				GSS_clear_ld(hSolver);
 		}
 	}
-	free(ptr);
-	free(ind);
-	free(val);
-	free(rhs);
+	
 }
 
-void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 
 	double ahy = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dz)*(1 / dz));
@@ -593,6 +592,7 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now)
 	//-----------------------------------------------------------rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
+	
 	for (int i = 0; i < Nx-1; i++)
 	{
 		for (int j = 0; j < Ny-1; j++)
@@ -638,13 +638,10 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now)
 				GSS_clear_ld(hSolver);
 		}
 	}
-	free(ptr);
-	free(ind);
-	free(val);
-	free(rhs);
+	
 }
 
-void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now)
+void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 {
 	double ahz = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dx)*(1 / dx));
 	double bhz = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dx)*(1 / dx));
@@ -701,6 +698,7 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now)
 	//-----------------------------------------------------------rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
+	
 	for (int j = 0; j < Ny-1; j++)
 	{
 		for (int k = 0; k < Nz-1; k++)
@@ -746,10 +744,7 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now)
 				GSS_clear_ld(hSolver);
 		}
 	}
-	free(ptr);
-	free(ind);
-	free(val);
-	free(rhs);
+	
 }
 
 #endif
