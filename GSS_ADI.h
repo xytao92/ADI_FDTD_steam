@@ -180,8 +180,17 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			
 			for (int j1 = 0; j1 < Ny-1; j1++)
 			{//保存结果
-				halfgrid_now[i*Ny*Nz + j1*Nz + k].ex = rhs[j1];
-				halfgrid_before[i*Ny*Nz + j1*Nz + k].ex = halfgrid_now[i*Ny*Nz + j1*Nz + k].ex;
+				if (i == 0)
+				{
+					
+					halfgrid_now[j1*Nz + k].ex =0.0;
+					halfgrid_before[j1*Nz + k].ex = 0.0;
+				}
+				else
+				{
+					halfgrid_now[i*Ny*Nz + j1*Nz + k].ex = rhs[j1];
+					halfgrid_before[i*Ny*Nz + j1*Nz + k].ex = halfgrid_now[i*Ny*Nz + j1*Nz + k].ex;
+				}
 			}
 			
 			if (hSolver != NULL)
@@ -292,9 +301,20 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
-			for (int k1 = 0; k1 < Nz-1; k1++){//保存结果
-				halfgrid_now[i*Ny*Nz + j*Nz + k1].ey = rhs[k1];
-				halfgrid_before[i*Ny*Nz + j*Nz + k1].ey = halfgrid_now[i*Ny*Nz + j*Nz + k1].ey;
+			for (int k1 = 0; k1 < Nz-1; k1++)
+			{
+				if (i == 0)
+				{
+
+					halfgrid_now[j*Nz + k1].ey = 0.0;
+					halfgrid_before[j*Nz + k1].ey = 0.0;
+				}
+				else
+				{
+					//保存结果
+					halfgrid_now[i*Ny*Nz + j*Nz + k1].ey = rhs[k1];
+					halfgrid_before[i*Ny*Nz + j*Nz + k1].ey = halfgrid_now[i*Ny*Nz + j*Nz + k1].ey;
+				}
 			}
 
 			if (hSolver != NULL)	
@@ -369,7 +389,7 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int i = 0; i < Nx-1; i++)
 			{
 				////if ( i == 0&& j == 10&&k == 5)//加点源位置，保证不会被覆盖
-				////	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);//100为设置值//
+				////	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = hm * sin(omega*step*dt);//hm为设置值//
 				//首先处理矩阵方程的右端项rhs数组
 			     if (i == 0 && j != 0)
 					rhs[i] =  bez*halfgrid_before[i*Ny*Nz + j*Nz + k].ez + cez*halfgrid_before[(i + 1)*Ny*Nz + j*Nz + k].ez
@@ -410,8 +430,8 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{//保存结果
 				if (i1 == 0)
 				{
-					//halfgrid_before[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
-					halfgrid_now[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
+					halfgrid_before[j*Nz + k].ez = ((omega*mur0*Y) / pi) * hm * sin((pi / Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
+					halfgrid_now[j*Nz + k].ez = ((omega*mur0*Y) / pi) * hm * sin((pi / Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
 				}
 				else
 				{
@@ -524,9 +544,19 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
-			for (int j1 = 0; j1 < Ny-1; j1++){//保存结果
-				halfgrid_now[i*Ny*Nz + j1*Nz + k].bx = rhs[j1];
-				halfgrid_before[i*Ny*Nz + j1*Nz + k].bx = halfgrid_now[i*Ny*Nz + j1*Nz + k].bx;
+			for (int j1 = 0; j1 < Ny-1; j1++)
+			{//保存结果
+				if (i == 0)
+				{
+					halfgrid_before[j1*Nz + k].bx = hm * cos((pi / Y)*j1*dy)*cos(omega*step*dt);
+					halfgrid_now[j1*Nz + k].bx = hm * cos((pi / Y)*j1*dy)*cos(omega*step*dt);
+				}
+				else
+				{
+					halfgrid_now[i*Ny*Nz + j1*Nz + k].bx = rhs[j1];
+					halfgrid_before[i*Ny*Nz + j1*Nz + k].bx = halfgrid_now[i*Ny*Nz + j1*Nz + k].bx;
+				}
+				
 			}
 
 			if (hSolver != NULL)
@@ -631,9 +661,20 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
-			for (int k1 = 0; k1 < Nz-1; k1++){//保存结果
-				halfgrid_now[i*Ny*Nz + j*Nz + k1].by = rhs[k1];
-				halfgrid_before[i*Ny*Nz + j*Nz + k1].by = halfgrid_now[i*Ny*Nz + j*Nz + k1].by;
+			for (int k1 = 0; k1 < Nz-1; k1++)
+			{//保存结果
+				if (i == 0)
+				{
+					halfgrid_before[j*Nz + k1].by = -1 * (Y*bate / pi) * hm * sin(pi / Y*j*dy)*sin(omega*step*dt);
+					halfgrid_now[j*Nz + k1].by = -1 * (Y*bate / pi) * hm * sin(pi / Y*j*dy)*sin(omega*step*dt);
+				}
+				else
+				{
+					halfgrid_now[i*Ny*Nz + j*Nz + k1].by = rhs[k1];
+				    halfgrid_before[i*Ny*Nz + j*Nz + k1].by = halfgrid_now[i*Ny*Nz + j*Nz + k1].by;
+
+				}
+			
 			}
 
 			if (hSolver != NULL)
@@ -737,9 +778,20 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
-			for (int i1 = 0; i1 < Nx-1; i1++){//保存结果
-				halfgrid_now[i1*Ny*Nz + j*Nz + k].bz = rhs[i1];
-				halfgrid_before[i1*Ny*Nz + j*Nz + k].bz = halfgrid_now[i1*Ny*Nz + j*Nz + k].bz;
+			for (int i1 = 0; i1 < Nx-1; i1++)
+			{//保存结果
+				if (i1 == 0)
+				{
+
+					halfgrid_now[j*Nz + k].bz = 0.0;
+					halfgrid_before[j*Nz + k].bz = 0.0;
+				}
+				else
+				{
+					halfgrid_now[i1*Ny*Nz + j*Nz + k].bz = rhs[i1];
+					halfgrid_before[i1*Ny*Nz + j*Nz + k].bz = halfgrid_now[i1*Ny*Nz + j*Nz + k].bz;
+				}
+
 			}
 
 			if (hSolver != NULL)

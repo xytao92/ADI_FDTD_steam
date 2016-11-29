@@ -41,7 +41,8 @@ const double epsl0 = 8.854e-12;//自由空间介电常数
 const double mur0 = 4.0*pi*1.0e-7;//自由空间导磁率
 const double  k0 = omega*sqrt(mur0*epsl0);//自由空间波数//
 const double kc = pi / Y; //TE10模截止波数//
-
+const double bate = sqrt(k0*k0 - kc*kc);
+const double hm = 100;
 
 const double epsl_x = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dy * dy)));
 const double epsl_y = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dz * dz)));

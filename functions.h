@@ -62,20 +62,40 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 }
 
 void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激励源//
-{/*
+{
 	int i =0,j =10, k=5;//加点源的位置//
-	//double k0 = omega*sqrt(mur0*epsl0);
-	//double kc = pi/Y ;
-	//double bate = sqrt(k0*k0-kc*kc);
-	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100为设置值//115
-	halfgrid_now[i*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);
-	*/
+	double k0 = omega*sqrt(mur0*epsl0);
+	double kc = pi/Y ;
+	double bate = sqrt(k0*k0-kc*kc);
+	//halfgrid_before[i*Ny*Nz + j*Nz + k].ez = hm*sin(omega*step*dt);//hm为设置值//115
+	//halfgrid_now[i*Ny*Nz + j*Nz + k].ez = hm * sin(omega*step*dt);
+	
 	for (int j = 0; j < Ny - 1; j++)
 	{
 		for (int k = 0; k < Nz - 1; k++)
 		{
-			halfgrid_before[j*Nz + k].ez = 100 * sin((pi/Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
-			halfgrid_now[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
+			//加一个完整的TE10,模式
+			halfgrid_before[j*Nz + k].ex = 0.0;
+			halfgrid_now[j*Nz + k].ex = 0.0;
+
+			halfgrid_before[j*Nz + k].ey = 0.0;
+			halfgrid_now[j*Nz + k].ey = 0.0;
+			
+			halfgrid_before[j*Nz + k].ez =( (omega*mur0*Y)/pi) *hm* sin((pi/Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
+			halfgrid_now[j*Nz + k].ez =( (omega*mur0*Y) / pi) * hm * sin((pi / Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
+
+			halfgrid_before[j*Nz + k].bx = hm*cos((pi/Y)*j*dy)*cos(omega*step*dt);
+			halfgrid_now[j*Nz + k].bx = hm * cos((pi / Y)*j*dy)*cos(omega*step*dt);
+
+			halfgrid_before[j*Nz + k].by = -1* (Y*bate/pi)*hm*sin(pi/Y*j*dy)*sin(omega*step*dt);
+			halfgrid_now[j*Nz + k].by = -1 * (Y*bate / pi) * hm * sin(pi / Y*j*dy)*sin(omega*step*dt);
+
+			halfgrid_before[j*Nz + k].bz = 0.0;
+			halfgrid_now[j*Nz + k].bz = 0.0;
+
+			
+
+
 		}
 	}
 }
