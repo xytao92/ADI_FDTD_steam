@@ -62,13 +62,22 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 }
 
 void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激励源//
-{
+{/*
 	int i =0,j =10, k=5;//加点源的位置//
 	//double k0 = omega*sqrt(mur0*epsl0);
 	//double kc = pi/Y ;
 	//double bate = sqrt(k0*k0-kc*kc);
 	halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 100*sin(omega*step*dt);//100为设置值//115
 	halfgrid_now[i*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);
+	*/
+	for (int j = 0; j < Ny - 1; j++)
+	{
+		for (int k = 0; k < Nz - 1; k++)
+		{
+			halfgrid_before[j*Nz + k].ez = 100 * sin((pi/Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
+			halfgrid_now[j*Nz + k].ez = 100 * sin((pi / Y)*j*dy)*sin(omega*step*dt);//100为设置值//115
+		}
+	}
 }
 
 //void trade(double*b, int n, int m, double*d)

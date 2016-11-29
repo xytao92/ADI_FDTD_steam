@@ -24,7 +24,7 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 	system("mkdir result");
-	ofstream file("result\\GSS_matel_steam1_3.txt");//用于保存结果
+	ofstream file("result\\GSS_matel_steam2_1.txt");//用于保存结果
 
 	//*******计算TE10模******//注意边界条件的问题，不处理周围的四个面
 	//PART1---- 计算电场//
@@ -412,13 +412,16 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = rhs[i1];
 
 				halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = halfgrid_now[i1*Ny*Nz + j*Nz + k].ez;
-
-				if (i1 == 0 && j == 10 && k == 5)//加点源位置，保证不会被覆盖
-				{
-					halfgrid_before[i1*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);//100为设置值//
-					halfgrid_now[i1*Ny*Nz + j*Nz + k].ez = 100 * sin(omega*step*dt);
-				}
 			}
+
+			for (int j0 = 0; j < Ny - 1; j++)
+				{
+					for (int k0 = 0; k < Nz - 1; k++)
+					{
+						halfgrid_before[j0*Nz + k0].ez = 100 * sin((pi / Y)*j0*dy)*sin(omega*step*dt);//100为设置值//115
+						halfgrid_now[j0*Nz + k0].ez = 100 * sin((pi / Y)*j0*dy)*sin(omega*step*dt);//100为设置值//115
+					}
+				}
 
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
