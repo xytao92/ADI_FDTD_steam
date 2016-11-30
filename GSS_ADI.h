@@ -46,7 +46,7 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 		matel_gsscalc_by(halfgrid_before, halfgrid_now,step);
 	    matel_gsscalc_bz(halfgrid_before, halfgrid_now,step);
 
-		int result_x = 0;
+		int result_x = 5;
 		int result_y = 10;
 		int result_z = 5;
 		

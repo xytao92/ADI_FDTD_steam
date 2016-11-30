@@ -92,10 +92,6 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 
 			halfgrid_before[j*Nz + k].bz = 0.0;
 			halfgrid_now[j*Nz + k].bz = 0.0;
-
-			
-
-
 		}
 	}
 }
