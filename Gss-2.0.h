@@ -30,7 +30,7 @@ ind[7]={0,2,1,2,0,1,2};
 val[7]={1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
 
 Copyright (c) 2005-present by YingShiChen.    All Rights Reserved.
-Any problem,contact gsp@grusoft.com
+Any problem,contact gspkgrusoft.com
 */
 //#ifndef _GSS_2_0_
 //#define _GSS_2_0_

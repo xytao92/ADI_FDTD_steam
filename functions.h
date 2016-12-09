@@ -9,37 +9,37 @@
 
 void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)//网格的初始化
 {
-	for (int i = 0; i<Nx; i++)
-		for (int j = 0; j<Ny; j++)
-			for (int k = 0; k<Nz; k++)
+	for (int k = 0; k<Nz; k++)
+		for (int i = 0; i<Nx; i++)
+			for (int j = 0; j<Ny; j++)
 			{
-				halfgrid_now[i*Ny*Nz + j*Nz + k].ex = 0;
-				halfgrid_now[i*Ny*Nz + j*Nz + k].ey = 0;
-				halfgrid_now[i*Ny*Nz + j*Nz + k].ez = 0;
-				halfgrid_now[i*Ny*Nz + j*Nz + k].bx = 0;
-				halfgrid_now[i*Ny*Nz + j*Nz + k].by = 0;
-				halfgrid_now[i*Ny*Nz + j*Nz + k].bz = 0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].ex = 0.0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].ey = 0.0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].ez = 0.0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].bx = 0.0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].by = 0.0;
+				halfgrid_now[k*Nx*Ny + i*Ny + j].bz = 0.0;
 
-				halfgrid_before[i*Ny*Nz + j*Nz + k].ex = 0;
-				halfgrid_before[i*Ny*Nz + j*Nz + k].ey = 0;
-				halfgrid_before[i*Ny*Nz + j*Nz + k].ez = 0;
-				halfgrid_before[i*Ny*Nz + j*Nz + k].bx = 0;
-				halfgrid_before[i*Ny*Nz + j*Nz + k].by = 0;
-				halfgrid_before[i*Ny*Nz + j*Nz + k].bz = 0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].ex = 0.0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].ey = 0.0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].ez = 0.0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].bx = 0.0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].by = 0.0;
+				halfgrid_before[k*Nx*Ny + i*Ny + j].bz = 0.0;
 
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ex = 0;
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ey = 0;
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].ez = 0;
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].bx = 0;
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].by = 0;
-				halfgrid_beforeX2[i*Ny*Nz + j*Nz + k].bz = 0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].ex = 0.0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].ey = 0.0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].ez = 0.0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].bx = 0.0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].by = 0.0;
+				halfgrid_beforeX2[k*Nx*Ny + i*Ny + j].bz = 0;
 
-				/*grid_result[i*Ny*Nz + j*Nz + k].ex = 0;
-				grid_result[i*Ny*Nz + j*Nz + k].ey = 0;
-				grid_result[i*Ny*Nz + j*Nz + k].ez = 0;
-				grid_result[i*Ny*Nz + j*Nz + k].bx = 0;
-				grid_result[i*Ny*Nz + j*Nz + k].by = 0;
-				grid_result[i*Ny*Nz + j*Nz + k].bz = 0;*/
+				/*grid_result[k*Nx*Ny + i*Ny + j].ex = 0.0;
+				grid_result[k*Nx*Ny + i*Ny + j].ey = 0.0;
+				grid_result[k*Nx*Ny + i*Ny + j].ez = 0.0;
+				grid_result[k*Nx*Ny + i*Ny + j].bx = 0.0;
+				grid_result[k*Nx*Ny + i*Ny + j].by = 0.0;
+				grid_result[k*Nx*Ny + i*Ny + j].bz = 0.0;*/
 			}
 
 }
@@ -48,8 +48,8 @@ void save_result( Grid* halfgrid_now,int step)
 {
 	system("mkdir result");
 	ofstream file("result\\leapforg_ADI_FDTD_steam0.1.txt");//用于保存结果
-	file << step << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ex << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ey << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].ez << '\t';
-	file << step << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].bx << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].by << '\t' << halfgrid_now[20 * Ny*Nz + 20 * Nz + 20].bz << '\t';
+	file << step << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ez << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ex << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ey << '\t';
+	file << step << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].bz << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].bx << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].by << '\t';
 	file << '\n';
 }
 
@@ -63,72 +63,45 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 
 void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激励源//
 {
-	int i =0,j =10, k=5;//加点源的位置//
-	double k0 = omega*sqrt(mur0*epsl0);
-	double kc = pi/Y ;
-	double bate = sqrt(k0*k0-kc*kc);
-	//halfgrid_before[i*Ny*Nz + j*Nz + k].ez = hm*sin(omega*step*dt);//hm为设置值//115
-	//halfgrid_now[i*Ny*Nz + j*Nz + k].ez = hm * sin(omega*step*dt);
+	int k =0;//加点源的位置//
 	
-	for (int j = 0; j < Ny - 1; j++)
+	//halfgrid_before[k*Ny*Nz + i*Nz + j].ez = hm*sin(omega*step*dt);//hm为设置值//115
+	//halfgrid_now[k*Nx*Ny + i*Ny + j].ez = hm * sin(omega*step*dt);
+	
+	for (int i = 0; i < Nx - 1; i++)
 	{
-		for (int k = 0; k < Nz - 1; k++)
+		for (int j = 0; j < Ny - 1; j++)
 		{
 			//加一个完整的TE10,模式
-			halfgrid_before[j*Nz + k].ex = 0.0;
-			halfgrid_now[j*Nz + k].ex = 0.0;
+			halfgrid_before[i*Ny + j].ez = 0.0;
+			halfgrid_now[i*Ny + j].ez = 0.0;
 
-			halfgrid_before[j*Nz + k].ey = 0.0;
-			halfgrid_now[j*Nz + k].ey = 0.0;
+			halfgrid_before[i*Ny + j].ex = 0.0;
+			halfgrid_now[i*Ny + j].ex = 0.0;
 			
-			halfgrid_before[j*Nz + k].ez =( (omega*mur0*Y)/pi) *hm* sin((pi/Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
-			halfgrid_now[j*Nz + k].ez =( (omega*mur0*Y) / pi) * hm * sin((pi / Y)*j*dy)*sin(omega*step*dt);//hm为设置值//115
+			halfgrid_before[i*Ny + j].ey =((omega*mur0*X)/pi) * hm * sin((pi/X)*i*dx) * sin(omega*step*dt);//hm为设置值//115
+			halfgrid_now[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);//hm为设置值//115
 
-			halfgrid_before[j*Nz + k].bx = hm*cos((pi/Y)*j*dy)*cos(omega*step*dt);
-			halfgrid_now[j*Nz + k].bx = hm * cos((pi / Y)*j*dy)*cos(omega*step*dt);
+			//由于bate会在不同的频率下产生误差会造成相当于输入了两个源
+			halfgrid_before[i*Ny + j].bz = hm*cos((pi/X)*i*dx)*cos(omega*step*dt);
+			halfgrid_now[i*Ny + j].bz = hm * cos((pi / X)*i*dx)*cos(omega*step*dt);
+			/*halfgrid_before[i*Ny + j].bz = 0.0;
+			halfgrid_now[i*Ny + j].bz = 0.0;*/
 
-			halfgrid_before[j*Nz + k].by = -1* (Y*bate/pi)*hm*sin(pi/Y*j*dy)*sin(omega*step*dt);
-			halfgrid_now[j*Nz + k].by = -1 * (Y*bate / pi) * hm * sin(pi / Y*j*dy)*sin(omega*step*dt);
+			halfgrid_before[i*Ny + j].bx = -1*(X*bate/pi)*hm*sin((pi/X)*i*dx)*sin(omega*step*dt);
+			halfgrid_now[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
+			//halfgrid_before[i*Ny + j].bx = 0.0;
+			//halfgrid_now[i*Ny + j].bx = 0.0;
 
-			halfgrid_before[j*Nz + k].bz = 0.0;
-			halfgrid_now[j*Nz + k].bz = 0.0;
+			halfgrid_before[i*Ny + j].by = 0.0;
+			halfgrid_now[i*Ny + j].by = 0.0;
 		}
 	}
 }
 
-//void trade(double*b, int n, int m, double*d)
-//{
-//	double s = 0;
-//	int j, k;
-//	if (m != 3 * n - 2)//首先判断是否满足三对角矩阵的结构条件
-//	{
-//		cout << "矩阵不满足三对角矩阵的条件！" << endl;
-//	}
-//	for (int k = 0; k <= n - 2; k++)
-//	{
-//		int j = k * 3;
-//		double s = b[j];
-//		if (fabs(s) + 1.0 == 1.0)//fabs()函数是求浮点数的绝对值，返回类型为double
-//		{
-//			cout << "分母为0、计算错误！" << endl;
-//		}
-//		b[j + 1] = b[j + 1] / s;//系数矩阵归一化
-//		d[k] = d[k] / s;//常数向量归一化
-//		b[j + 3] = b[j + 3] - b[j + 2] * b[j + 1];//系数矩阵消元
-//		d[k + 1] = d[k + 1] - b[j + 2] * d[k];
-//	}
-//	s = b[3 * n - 3];
-//	if (fabs(s) + 1.0 == 1.0)
-//	{
-//		cout << "分母为0，计算有误！" << endl;
-//	}
-//	d[n - 1] = d[n - 1] / s;//回带，解出x(n-1)
-//	for (k = n - 2; k >= 0; k--)
-//	{
-//		d[k] = d[k] - b[3 * k + 1] * d[k + 1];
-//	}
-//	
-//}
+
+
+//以下函数没有修改坐标系，按照老的坐标系来------------------------！！！！！！！
 
 void adi_fdtd_leapforg_matel(Grid* halfgrid_before,Grid* halfgrid_now)
 
