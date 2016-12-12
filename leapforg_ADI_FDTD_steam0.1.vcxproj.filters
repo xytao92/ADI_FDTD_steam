@@ -27,7 +27,10 @@
     <ClInclude Include="Gss-2.0.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GSS_ADI.h">
+    <ClInclude Include="GSS_ADI_mur.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GSS_ADI_matel.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

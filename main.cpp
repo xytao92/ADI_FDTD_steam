@@ -3,7 +3,8 @@
 #include "definer.h"
 #include "grid.h"
 #include "functions.h"
-#include"GSS_ADI.h"
+#include"GSS_ADI_matel.h"
+#include"GSS_ADI_mur.h"
 
 int main()
 {
@@ -24,7 +25,7 @@ int main()
 	    }
 		else if (choice == 2)
 		{
-			adi_fdtd_leapforg_mur(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//进行计算
+			adi_fdtd_leapforg_mur_GSS(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//进行计算
 			break;
 		}
 		else

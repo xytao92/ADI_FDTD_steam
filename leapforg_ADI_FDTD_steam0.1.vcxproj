@@ -128,7 +128,8 @@
     <ClInclude Include="functions.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="Gss-2.0.h" />
-    <ClInclude Include="GSS_ADI.h" />
+    <ClInclude Include="GSS_ADI_matel.h" />
+    <ClInclude Include="GSS_ADI_mur.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

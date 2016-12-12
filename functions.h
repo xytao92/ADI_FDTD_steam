@@ -44,15 +44,6 @@ void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 
 }
 
-void save_result( Grid* halfgrid_now,int step)
-{
-	system("mkdir result");
-	ofstream file("result\\leapforg_ADI_FDTD_steam0.1.txt");//用于保存结果
-	file << step << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ez << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ex << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].ey << '\t';
-	file << step << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].bz << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].bx << '\t' << halfgrid_now[20 * Nx*Ny + 20 * Ny + 20].by << '\t';
-	file << '\n';
-}
-
 void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	delete halfgrid_before;
@@ -73,26 +64,32 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 		for (int j = 0; j < Ny - 1; j++)
 		{
 			//加一个完整的TE10,模式
+			halfgrid_beforeX2[i*Ny + j].ez = 0.0;
 			halfgrid_before[i*Ny + j].ez = 0.0;
 			halfgrid_now[i*Ny + j].ez = 0.0;
 
+			halfgrid_beforeX2[i*Ny + j].ex = 0.0;
 			halfgrid_before[i*Ny + j].ex = 0.0;
 			halfgrid_now[i*Ny + j].ex = 0.0;
 			
+			halfgrid_beforeX2[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
 			halfgrid_before[i*Ny + j].ey =((omega*mur0*X)/pi) * hm * sin((pi/X)*i*dx) * sin(omega*step*dt);//hm为设置值//115
 			halfgrid_now[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);//hm为设置值//115
 
 			//由于bate会在不同的频率下产生误差会造成相当于输入了两个源
+			halfgrid_beforeX2[i*Ny + j].bz = hm*cos((pi / X)*i*dx)*cos(omega*step*dt);
 			halfgrid_before[i*Ny + j].bz = hm*cos((pi/X)*i*dx)*cos(omega*step*dt);
 			halfgrid_now[i*Ny + j].bz = hm * cos((pi / X)*i*dx)*cos(omega*step*dt);
 			/*halfgrid_before[i*Ny + j].bz = 0.0;
 			halfgrid_now[i*Ny + j].bz = 0.0;*/
 
+			halfgrid_beforeX2[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
 			halfgrid_before[i*Ny + j].bx = -1*(X*bate/pi)*hm*sin((pi/X)*i*dx)*sin(omega*step*dt);
 			halfgrid_now[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
 			//halfgrid_before[i*Ny + j].bx = 0.0;
 			//halfgrid_now[i*Ny + j].bx = 0.0;
 
+			halfgrid_beforeX2[i*Ny + j].by = 0.0;
 			halfgrid_before[i*Ny + j].by = 0.0;
 			halfgrid_now[i*Ny + j].by = 0.0;
 		}
