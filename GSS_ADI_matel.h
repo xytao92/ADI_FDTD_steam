@@ -26,8 +26,8 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 	system("mkdir result");
-	ofstream file("result\\temp17.txt");//用于保存结果
-	ofstream file2("result\\platform.txt");
+	ofstream file("result\\temp_matel.txt");//用于保存结果
+	ofstream file2("result\\platform_matel.txt");
 	//*******计算TE10模******//注意边界条件的问题，不处理周围的四个面
 	//PART1---- 计算电场//
 
@@ -59,7 +59,7 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 		cout << "Step--- " << step << " ---has finished." << endl;
 		step++;
 	}//while
-	for (int i = 0; i < Nx; i++)
+	for (int i = 0; i < Nx; i++)//输出一个横截面的数据
 	{
 		for (int k = 0; k < Nz; k++)
 		{
@@ -192,21 +192,15 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{//保存结果
-			 /*if (k == 0)
-			 {
-			 halfgrid_now[i1*Ny + j].ez =0.0;
-			 halfgrid_before[i1*Ny + j].ez = 0.0;
-			 }*/
-				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ex的边界问题，在四个面的位置应该为0
-				{
-					halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = 0.0;
-					halfgrid_before[k*Nx*Ny + i1*Ny + j].ez = 0.0;
-				}
-				else
-				{
+
+				halfgrid_before[k*Nx*Ny + i1*Ny + j].ez = halfgrid_now[k*Nx*Ny + i1*Ny + j].ez;
+				halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = rhs[i1];
+			//对结果进行修正
+				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ez的边界问题，在四个面的位置应该为0
+				{					
 					halfgrid_before[k*Nx*Ny + i1*Ny + j].ez = halfgrid_now[k*Nx*Ny + i1*Ny + j].ez;
-					halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = rhs[i1];
-				}
+					halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = 0.0;
+				}				
 			}
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
@@ -315,31 +309,17 @@ void matel_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
-			{
-				/*if (k == 0)
-				{
-				halfgrid_now[i*Ny + j1].ex = 0.0;
-				halfgrid_before[i*Ny + j1].ex = 0.0;
-				}*/
+			{			
+				//先保存结果
+				halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = halfgrid_now[k*Nx*Ny + i*Ny + j1].ex;
+				halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = rhs[j1];
+				//对结果进行修正
 				if (j1 == 0 || j1 == Ny - 2 || k == 0 || k == Nz - 2)
 				{
-					halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = 0.0;
+					halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = halfgrid_now[k*Nx*Ny + i*Ny + j1].ex;					
 					halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = 0.0;
 				}
-				else if (k == Nz - 2)
-				{
-					
-					halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = halfgrid_now[k*Nx*Ny + i*Ny + j1].ex;
-					halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = halfgrid_before[k*Nx*Ny + i*Ny + j1].ex + (c*dt - dz) / (c*dt + dz)*(halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex - halfgrid_before[k*Nx*Ny + i*Ny + j1].ex);
 				
-				}
-				else
-				{
-					//保存结果
-					halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = halfgrid_now[k*Nx*Ny + i*Ny + j1].ex;
-					halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = rhs[j1];
-
-				}
 			}
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
@@ -449,30 +429,19 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			for (int k1 = 0; k1 < Nz - 1; k1++)
 			{//保存结果
+				halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
+				halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = rhs[k1];
+				//对结果进行修正
 				if (k1 == 0)
-				{
-					halfgrid_before[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);//hm为设置值//115
-					halfgrid_now[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);//hm为设置值//115
+				{					
+					halfgrid_now[i*Ny + j].ey = halfgrid_before[i*Ny + j].ey;//不改变源的值
 				}
-				else if (i == 0 || i == Nx - 1 || k1 == 0)
+				else if (i == 0 || i == Nx - 1 || k1 == Nz - 2)
 				{
-					halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = 0.0;
+					halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
 					halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = 0.0;
 				}
-				else if (k1 == Nz - 2)
-				{
-					
-					halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
-					halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = halfgrid_before[k1*Nx*Ny + i*Ny + j].ey + (c*dt - dz) / (c*dt + dz)*(halfgrid_now[(k1 - 1)*Nx*Ny + i*Ny + j].ey - halfgrid_before[k1*Nx*Ny + i*Ny + j].ey);
-				
-				}
-				else
-				{
-					halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
-					halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = rhs[k1];
-				}
 			}
-
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
@@ -576,24 +545,16 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{//保存结果
-			 /*	if (k == 0)
-			 {
-			 halfgrid_before[i1*Ny + j].bz = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt);
-			 halfgrid_now[i1*Ny + j].bz =  hm * cos((pi / X)*i1*dx)*cos(omega*step*dt);
-			 }*/
-				if (k == 0)
-				{
-					halfgrid_before[k*Nx*Ny + i1*Ny + j].bz = 0.0;
-					halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = 0.0;
-				}
-				else
+				halfgrid_before[k*Nx*Ny + i1*Ny + j].bz = halfgrid_now[k*Nx*Ny + i1*Ny + j].bz;
+				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
+				//对结果进行修正
+				if (k == 0 || k == Nz - 2)
 				{
 					halfgrid_before[k*Nx*Ny + i1*Ny + j].bz = halfgrid_now[k*Nx*Ny + i1*Ny + j].bz;
-					halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
+					halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = 0.0;
 				}
-
+				
 			}
-
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
@@ -698,25 +659,14 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{//保存结果
-			 //if (k == 0)
-			 //{
-			 //	halfgrid_before[i*Ny + j1].bx = -1 * (X*bate / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);
-			 //	halfgrid_now[i*Ny + j1].bx = -1 * (X*bate / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);
-
-			 //	//halfgrid_before[i*Ny + j1].bx = 0.0;
-			 //	//halfgrid_now[i*Ny + j1].bx = 0.0;
-			 //}
+				halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = halfgrid_now[k*Nx*Ny + i*Ny + j1].bx;
+				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
+				//对结果进行修正
 				if (i == 0 || i == Nx - 2)
 				{
-					halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = 0.0;
-					halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = 0.0;
-				}
-				else
-				{
 					halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = halfgrid_now[k*Nx*Ny + i*Ny + j1].bx;
-					halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
-				}
-
+					halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = 0.0;
+				}			
 			}
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
@@ -822,25 +772,22 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 
 			for (int k1 = 0; k1 < Nz - 1; k1++)
-			{//保存结果
+			{
+				//保存结果
+				halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;
+				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
+				//对结果进行修正
 				if (k1 == 0)
-				{
-					halfgrid_now[i*Ny + j].by = 0.0;
-					halfgrid_before[i*Ny + j].by = 0.0;
+				{		
+					 halfgrid_now[i*Ny + j].by = halfgrid_before[i*Ny + j].by;//不改变源的值
 				}
 				else if (j == 0 || j == Ny - 1)
 				{
-					halfgrid_before[k1*Nx*Ny + i*Ny + j].by = 0.0;
+					halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;		
 					halfgrid_now[k1*Nx*Ny + i*Ny + j].by = 0.0;
 				}
-				else
-				{
-					halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;
-					halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
-				}
-
+				
 			}
-
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 		}
