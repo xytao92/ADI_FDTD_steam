@@ -16,9 +16,9 @@ int main()
 	while (TRUE)
 	{
 		cout << "请输入吸收边界类型:\n" << endl;
-		cout << "1.金属吸收边界请\n" << endl;
-		cout << "2.一阶Mur吸收边界请\n" << endl;
-		cout << "3.二阶Mur吸收边界请\n" << endl;
+		cout << "1. 金属吸收边界\n" << endl;
+		cout << "2. 一阶Mur吸收边界\n" << endl;
+		cout << "3. 二阶Mur吸收边界\n" << endl;
 		cin >> choice;
 		switch (choice)
 		{

@@ -17,11 +17,11 @@
 using namespace std;
 //要求使用TE10模式作为强迫性激励源
 
-const double Z = 1.0; //单位m，波导长度，暂且设置的较长以便观察数据
+const double Z = 0.1; //单位m，波导长度，暂且设置的较长以便观察数据
 const double X = 0.02286; //单位m，波导宽度，依据BJ100标准宽度
 const double Y = 0.01016; //单位m, 波导高度，依据BJ100标准高度
 
-const int Nz = 501; //长度方向网格数
+const int Nz = 51; //长度方向网格数
 const int Nx = 21;//宽度方向网格数
 const int Ny = 11;//高度方向网格数
 
@@ -30,7 +30,7 @@ const double dx = X/(Nx-1); //w方向空间步长
 const double dy = Y/(Ny-1); //h方向空间步长
 
 const double dt = 1.0e-12; // 时间步长,  T=100dt ,T为输入源周期
-const int STEPS = 1200; //计算6000个时间步长的数据
+const int STEPS = 3000; //计算6000个时间步长的数据
 
 const double freq = 1.0e10; //入射场频率
 const double pi = 3.14159265359;
