@@ -90,7 +90,7 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//配置参数初始化
 	int type = 0;
 	//----------------------------------------------------------------------------
-	//---------------------------------------------------------------处理ptr数组
+	//-------------------------------------------------------------处理ptr数组
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -178,7 +178,7 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
 				//对结果进行修正
-				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ex的边界问题，在四个面的位置应该为0
+				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ex的边界问题，在四个面的位置应该为0,所有平面都进行处理
 				{
 					rhs[i1] = 0.0;
 				}	
@@ -420,7 +420,7 @@ void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int k1 = 0; k1 < Nz - 1; k1++)
 			{				
 				//对结果进行修正
-			    if ((i == 0 || i == Nx - 2) && ( k1 != 0 ) && ( k1 != Nz-2 ))//首先对前后两个平面进行处理，当然不能把左右也给处理了
+			    if (i == 0 || i == Nx - 2)//首先对前后两个平面进行处理，当然不能把左右也给处理了
 				{
 					rhs[k1] = 0.0;
 				}
@@ -547,7 +547,8 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{				
 				//对结果进行修正
-				if (k == 0)
+				
+			    if (k == 0)
 				{
 					rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt);
 				}
@@ -668,7 +669,12 @@ void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				{
 					rhs[j1] = 0.0;
 				}
+				else if (k == 0)
+				{
+					rhs[j1]= -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
+				}
 				//保存结果
+
 				halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = halfgrid_now[k*Nx*Ny + i*Ny + j1].bx;
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];				
 			}
@@ -779,14 +785,11 @@ void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				
 				//对结果进行修正
-				if (k1 == 0)
+				if (k1 == 0  || j == 0 || j == Ny - 2)
 				{
 					rhs[k1] = 0.0;		
 				}
-				else if (j == 0 || j == Ny - 2)
-				{
-					rhs[k1] = 0.0;
-				}
+				
 				//保存结果
 				halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
