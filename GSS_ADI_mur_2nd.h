@@ -840,8 +840,10 @@ void mur2_gsscalc_by(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgr
 			}
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
+
 		}
 	}
 }
+
 
 #endif

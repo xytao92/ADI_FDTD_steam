@@ -5,8 +5,8 @@ on time: 2016.11.22
 All Rights Receved
 */
 
-#ifndef _GSS_ADI_
-#define _GSS_ADI_
+#ifndef _GSS_ADI_MATEL_
+#define _GSS_ADI_MATEL_
 
 #include "definer.h"
 #include "grid.h"
@@ -26,13 +26,14 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 	//system("mkdir result");
-	ofstream file("result\\temp_matle_5.txt");//用于保存结果 temp_matle_2.txt
-	ofstream file2("result\\platform_matel_5.txt");//platform_matel.txt
+	ofstream file("result\\temp_matle_6.txt");//用于保存结果 temp_matle_2.txt
+	ofstream file2("result\\platform_matel_6.txt");//platform_matel.txt
 	//*******计算TE10模******//注意边界条件的问题，不处理周围的四个面
-	//PART1---- 计算电场//
+	//PART1---- 计算电场
+
 	int result_z = 2;
 	int result_x = 10;
-	int result_y = 5;//1270
+	int result_y = 5;
 
 	int step = 0;//计算时间步长
 	inject_field(halfgrid_before, halfgrid_now, step);	
@@ -50,8 +51,6 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 		matel_gsscalc_bz(halfgrid_before, halfgrid_now, step);
 		matel_gsscalc_bx(halfgrid_before, halfgrid_now, step);
 		matel_gsscalc_by(halfgrid_before, halfgrid_now, step);
-
-	
 
 		file << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
 		file << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
@@ -180,10 +179,10 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
 			//对结果进行修正
-				/*if (k == 0)//保证不改变源
-				{
-					rhs[i1] = 0.0;
-				}*/
+				//if (k == 0)//保证不改变源
+				//{
+				//	rhs[i1] = 0.0;
+				//}
 				
 				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ez的边界问题，在四个面的位置应该为0
 				{					
@@ -198,6 +197,7 @@ void matel_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
+
 		}
 	}
 }
@@ -547,7 +547,7 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				{
 					rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
 				}
-			    if ( k == Nz - 2)
+			    if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
 				{
 					rhs[i1] = 0.0;
 				}
@@ -666,10 +666,10 @@ void matel_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				{
 					rhs[j1] = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
 				}*/
-				if (i == 0 || i == Nx - 2)
+				/*if (i == 0 || i == Nx - 2)
 				{
 					rhs[j1] = 0.0;
-				}								
+				}	*/							
 				//保存结果
 				halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = halfgrid_now[k*Nx*Ny + i*Ny + j1].bx;
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];			
@@ -784,10 +784,10 @@ void matel_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				{
 					rhs[k1] = 0.0;
 				}*/
-				if ( j == 0 || j == Ny - 2)
+				/*if ( j == 0 || j == Ny - 2)
 				{
 					rhs[k1] = 0.0;
-				}
+				}*/
 				
 				//保存结果
 				halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;

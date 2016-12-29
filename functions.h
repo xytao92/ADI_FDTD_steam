@@ -59,15 +59,15 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 	//halfgrid_before[k*Ny*Nz + i*Nz + j].ez = hm*sin(omega*step*dt);//hm为设置值//115
 	//halfgrid_now[k*Nx*Ny + i*Ny + j].ez = hm * sin(omega*step*dt);
 	
-	for (int i = 0; i < Nx - 1; i++)
+	for (int i = 1; i < Nx - 2; i++)
 	{
-		for (int j = 0; j < Ny - 1; j++)
+		for (int j = 1; j < Ny - 2; j++)//不能将源加到边界面上
 		{
 			//加一个完整的TE10,模式 电场-----------------------------------------------------
 			/*halfgrid_beforeX2[i*Ny + j].ez = 0.0;
 			halfgrid_before[i*Ny + j].ez =halfgrid_beforeX2[i*Ny + j].ez;
-			halfgrid_now[i*Ny + j].ez = halfgrid_before[i*Ny + j].ez;*/
-
+			halfgrid_now[i*Ny + j].ez = halfgrid_before[i*Ny + j].ez;
+*/
 			halfgrid_beforeX2[i*Ny + j].ex = 0.0;
 			halfgrid_before[i*Ny + j].ex = halfgrid_beforeX2[i*Ny + j].ex;
 			halfgrid_now[i*Ny + j].ex = halfgrid_before[i*Ny + j].ex;
@@ -84,8 +84,8 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 
 			/*halfgrid_beforeX2[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
 			halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
-			halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
-
+			halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;
+*/
 			/*halfgrid_beforeX2[i*Ny + j].bx =0.0;
 			halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
 			halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
@@ -93,6 +93,7 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 			/*halfgrid_beforeX2[i*Ny + j].by = 0.0;
 			halfgrid_before[i*Ny + j].by = halfgrid_beforeX2[i*Ny + j].by;
 			halfgrid_now[i*Ny + j].by = halfgrid_before[i*Ny + j].by;*/
+
 		}
 	}
 }
