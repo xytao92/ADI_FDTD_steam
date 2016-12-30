@@ -425,7 +425,14 @@ void matel_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				if (k1 == 0)
 				{					
-					rhs[k1] =  ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);//不改变源的值
+					if (step*dt < 2 * T)
+					{
+						rhs[k1] = ((step*dt) / (2 * T))*((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+					}
+					else
+					{
+						rhs[k1] = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);//不改变源的值
+					}
 				}
 				
 				if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
@@ -545,7 +552,15 @@ void matel_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				//对结果进行修正				
 				if (k == 0)//不改变输入源的值
 				{
-					rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					if (step*dt < 2 * T)
+					{
+						rhs[i1]=((step*dt) / (2 * T))*hm*cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					}
+					else
+					{
+						rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					}
+					
 				}
 			    if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
 				{

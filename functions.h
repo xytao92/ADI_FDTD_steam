@@ -63,37 +63,75 @@ void inject_field(Grid* halfgrid_before, Grid* halfgrid_now,int step)//计算激
 	{
 		for (int j = 1; j < Ny - 2; j++)//不能将源加到边界面上
 		{
-			//加一个完整的TE10,模式 电场-----------------------------------------------------
-			/*halfgrid_beforeX2[i*Ny + j].ez = 0.0;
-			halfgrid_before[i*Ny + j].ez =halfgrid_beforeX2[i*Ny + j].ez;
-			halfgrid_now[i*Ny + j].ez = halfgrid_before[i*Ny + j].ez;
-*/
-			halfgrid_beforeX2[i*Ny + j].ex = 0.0;
-			halfgrid_before[i*Ny + j].ex = halfgrid_beforeX2[i*Ny + j].ex;
-			halfgrid_now[i*Ny + j].ex = halfgrid_before[i*Ny + j].ex;
+			if (step*dt < 2 * T)
+			{
+				//加一个完整的TE10,模式 电场-----------------------------------------------------
+				/*halfgrid_beforeX2[i*Ny + j].ez = ((step*dt) / (2 * T))*0.0;
+				halfgrid_before[i*Ny + j].ez =halfgrid_beforeX2[i*Ny + j].ez;
+				halfgrid_now[i*Ny + j].ez = halfgrid_before[i*Ny + j].ez;*/
+
+				halfgrid_beforeX2[i*Ny + j].ex = ((step*dt) / (2 * T))*0.0;
+				halfgrid_before[i*Ny + j].ex = halfgrid_beforeX2[i*Ny + j].ex;
+				halfgrid_now[i*Ny + j].ex = halfgrid_before[i*Ny + j].ex;
+
+				halfgrid_beforeX2[i*Ny + j].ey = ((step*dt) / (2 * T))*((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt); //-1 * pi*sin(pi*i*dx / X)*sin(2 * pi*freq*step*dt) / X;//((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+				halfgrid_before[i*Ny + j].ey = halfgrid_beforeX2[i*Ny + j].ey;//hm为设置值//115
+				halfgrid_now[i*Ny + j].ey = halfgrid_before[i*Ny + j].ey;//hm为设置值//115
+
+																		 //磁场---------------------------------------------------------------------------
+				halfgrid_beforeX2[i*Ny + j].bz = ((step*dt) / (2 * T))*hm*cos((pi / X)*i*dx)*cos(omega*step*dt*1.5);
+				halfgrid_before[i*Ny + j].bz = halfgrid_beforeX2[i*Ny + j].bz;
+				halfgrid_now[i*Ny + j].bz = halfgrid_before[i*Ny + j].bz;
+
+
+				/*halfgrid_beforeX2[i*Ny + j].bx = -1 *((step*dt) / (2 * T))* (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
+				halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
+				halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
+
+				/*halfgrid_beforeX2[i*Ny + j].bx =((step*dt) / (2 * T))*0.0;
+				halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
+				halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
+
+				/*halfgrid_beforeX2[i*Ny + j].by = ((step*dt) / (2 * T))*0.0;
+				halfgrid_before[i*Ny + j].by = halfgrid_beforeX2[i*Ny + j].by;
+				halfgrid_now[i*Ny + j].by = halfgrid_before[i*Ny + j].by;*/
+
+			}
+			else 
+			{
+				//加一个完整的TE10,模式 电场-----------------------------------------------------
+				/*halfgrid_beforeX2[i*Ny + j].ez = 0.0;
+				halfgrid_before[i*Ny + j].ez =halfgrid_beforeX2[i*Ny + j].ez;
+				halfgrid_now[i*Ny + j].ez = halfgrid_before[i*Ny + j].ez;*/
+
+				halfgrid_beforeX2[i*Ny + j].ex = 0.0;
+				halfgrid_before[i*Ny + j].ex = halfgrid_beforeX2[i*Ny + j].ex;
+				halfgrid_now[i*Ny + j].ex = halfgrid_before[i*Ny + j].ex;
+
+				halfgrid_beforeX2[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt); //-1 * pi*sin(pi*i*dx / X)*sin(2 * pi*freq*step*dt) / X;//((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+				halfgrid_before[i*Ny + j].ey = halfgrid_beforeX2[i*Ny + j].ey;//hm为设置值//115
+				halfgrid_now[i*Ny + j].ey = halfgrid_before[i*Ny + j].ey;//hm为设置值//115
+
+																		 //磁场---------------------------------------------------------------------------
+				halfgrid_beforeX2[i*Ny + j].bz = hm*cos((pi / X)*i*dx)*cos(omega*step*dt*1.5);
+				halfgrid_before[i*Ny + j].bz = halfgrid_beforeX2[i*Ny + j].bz;
+				halfgrid_now[i*Ny + j].bz = halfgrid_before[i*Ny + j].bz;
+
+
+				/*halfgrid_beforeX2[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
+				halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
+				halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
+
+				/*halfgrid_beforeX2[i*Ny + j].bx =0.0;
+				halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
+				halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
+
+				/*halfgrid_beforeX2[i*Ny + j].by = 0.0;
+				halfgrid_before[i*Ny + j].by = halfgrid_beforeX2[i*Ny + j].by;
+				halfgrid_now[i*Ny + j].by = halfgrid_before[i*Ny + j].by;*/
 			
-			halfgrid_beforeX2[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt); //-1 * pi*sin(pi*i*dx / X)*sin(2 * pi*freq*step*dt) / X;//((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
-			halfgrid_before[i*Ny + j].ey = halfgrid_beforeX2[i*Ny + j].ey;//hm为设置值//115
-			halfgrid_now[i*Ny + j].ey = halfgrid_before[i*Ny + j].ey;//hm为设置值//115
-
-			//磁场---------------------------------------------------------------------------
-			halfgrid_beforeX2[i*Ny + j].bz = hm*cos((pi / X)*i*dx)*cos(omega*step*dt*1.5);
-			halfgrid_before[i*Ny + j].bz = halfgrid_beforeX2[i*Ny + j].bz;
-			halfgrid_now[i*Ny + j].bz = halfgrid_before[i*Ny + j].bz;
+			}
 			
-
-			/*halfgrid_beforeX2[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
-			halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
-			halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;
-*/
-			/*halfgrid_beforeX2[i*Ny + j].bx =0.0;
-			halfgrid_before[i*Ny + j].bx = halfgrid_beforeX2[i*Ny + j].bx;
-			halfgrid_now[i*Ny + j].bx = halfgrid_before[i*Ny + j].bx;*/
-
-			/*halfgrid_beforeX2[i*Ny + j].by = 0.0;
-			halfgrid_before[i*Ny + j].by = halfgrid_beforeX2[i*Ny + j].by;
-			halfgrid_now[i*Ny + j].by = halfgrid_before[i*Ny + j].by;*/
-
 		}
 	}
 }

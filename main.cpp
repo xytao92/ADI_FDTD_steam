@@ -6,7 +6,7 @@
 #include "GSS_ADI_matel.h"
 #include "GSS_ADI_mur_1st.h"
 #include "GSS_ADI_mur_2nd.h"
-
+#include "3D_FDTD.h"
 int main()
 {
 	clock_t start_time = clock();
@@ -16,24 +16,30 @@ int main()
 	while (TRUE)
 	{
 		cout << "请输入吸收边界类型:\n" << endl;
-		cout << "1. 金属吸收边界\n" << endl;
-		cout << "2. 一阶Mur吸收边界\n" << endl;
-		cout << "3. 二阶Mur吸收边界\n" << endl;
+		cout << "1. FDTD算法求解\n" << endl;
+		cout << "2. 金属吸收边界\n" << endl;
+		cout << "3. 一阶Mur吸收边界\n" << endl;
+		cout << "4. 二阶Mur吸收边界\n" << endl;
 		cin >> choice;
 		switch (choice)
 		{
 
 		case 1:
 		{
-			adi_fdtd_leapforg_matel_GSS(halfgrid_before, halfgrid_now);//进行计算
+			fdtd_matel(halfgrid_before, halfgrid_now);//进行计算
 			break;
 		}
 		case 2:
 		{
-			adi_fdtd_leapforg_mur1_GSS(halfgrid_before, halfgrid_now);//进行计算
+			adi_fdtd_leapforg_matel_GSS(halfgrid_before, halfgrid_now);//进行计算
 			break;
 		}
 		case 3:
+		{
+			adi_fdtd_leapforg_mur1_GSS(halfgrid_before, halfgrid_now);//进行计算
+			break;
+		}
+		case 4:
 		{
 			adi_fdtd_leapforg_mur2_GSS(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//进行计算
 			break;

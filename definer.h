@@ -31,9 +31,10 @@ const double dx = X/(Nx-1); //w方向空间步长
 const double dy = Y/(Ny-1); //h方向空间步长
 
 const double dt = 1.0e-12; // 时间步长,  T=100dt ,T为输入源周期
-const int STEPS = 1000; //计算6000个时间步长的数据
+const int STEPS = 600; //计算6000个时间步长的数据
 
-const double freq = 9.0e9; //入射场频率
+const double freq = 10.0e9; //入射场频率10Ghz
+const double T = 1/freq; //入射场周期10e-10s
 const double pi = 3.14159265359;
 const double c = 2.99792458e8;
 const double omega = 2*pi*freq;//角速度//

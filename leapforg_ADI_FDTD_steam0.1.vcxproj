@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="3D_FDTD.h" />
     <ClInclude Include="definer.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="grid.h" />

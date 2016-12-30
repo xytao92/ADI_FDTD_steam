@@ -1,2 +1,3 @@
 ﻿  main.cpp
-LINK : fatal error LNK1104: 无法打开文件“E:\ADI_FDTD\ADI_FDTD_steam\x64\Debug\leapforg_ADI_FDTD_steam.exe”
+  leapforg_ADI_FDTD_steam0.1.vcxproj -> E:\ADI_FDTD\ADI_FDTD_steam\x64\Debug\leapforg_ADI_FDTD_steam.exe
+  leapforg_ADI_FDTD_steam0.1.vcxproj -> E:\ADI_FDTD\ADI_FDTD_steam\x64\Debug\leapforg_ADI_FDTD_steam.pdb (Full PDB)

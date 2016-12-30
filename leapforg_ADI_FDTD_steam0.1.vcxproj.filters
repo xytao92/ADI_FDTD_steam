@@ -36,6 +36,9 @@
     <ClInclude Include="GSS_ADI_mur_2nd.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="3D_FDTD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
