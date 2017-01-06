@@ -1,85 +1,81 @@
 
 /*
-
 Writen By LiuZhiChao
 on time: 2016.11.22
 All Rights Receved
-
 */
 
-#ifndef _GSS_ADI_mur_
-#define _GSS_ADI_mur_
+#ifndef _GSS_ADI_MUR_1st_
+#define _GSS_ADI_MUR_1st_
 
 #include "definer.h"
 #include "grid.h"
 #include"functions.h"
 #include"Gss-2.0.h"
+//------------------------------------------函数声明
+void mur1_gsscalc_ez(Grid* halfgrid_now, int step);
+void mur1_gsscalc_ex(Grid* halfgrid_now, int step);
+void mur1_gsscalc_ey(Grid* halfgrid_now, int step);
 
-//-----------------------------------------------------------------------函数声明
+void mur1_gsscalc_bz(Grid* halfgrid_now, int step);
+void mur1_gsscalc_bx(Grid* halfgrid_now, int step);
+void mur1_gsscalc_by(Grid* halfgrid_now, int step);
 
-void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step);
-void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step);
-void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void gss_cal_mur1(Grid* halfgrid_now, int step);
 
-void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step);
-void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step);
-void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step);
+void save_result_mur1(Grid* halfgrid_now, int step);
+void get_plat_mur1(Grid* halfgrid_now);
+//=========================输出文件声明=========================//
 
-void adi_fdtd_leapforg_mur1_GSS(Grid* halfgrid_before, Grid* halfgrid_now)
 
+//============================总调度============================//
+void adi_fdtd_leapforg_mur1_GSS(Grid* halfgrid_now)
 {
 	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
-	//system("mkdir result");
-	ofstream file("result\\temp_mur_6.txt");//用于保存结果 temp_matle_2.txt
-	ofstream file2("result\\platform_mur_6.txt");//platform_matel.txt
-   //*******计算TE10模******
-   //注意边界条件的问题，不处理周围的四个面
-   //PART1---- -------------------------------------------计算电场
 
-	int result_z = 2;
-	int result_x = 10;
-	int result_y = 5;
-
-	int step = 0;//计算时间步长
-	inject_field(halfgrid_before, halfgrid_now, step);
+	//注意边界条件的问题，不处理周围的四个面
+    ofstream file_mur1("result\\temp_mur1_7.txt");
+    ofstream file2_mur1("result\\platform_mur1_7.txt");
+	int step = 0;//时间步长
+	init_source(halfgrid_now);//初始化输入源	
 
 	while (step < STEPS)
 	{
-		//---------------------------------------------------------------------------------------计算电场
 		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
 
-		mur1_gsscalc_ez(halfgrid_before, halfgrid_now, step);
-		mur1_gsscalc_ex(halfgrid_before, halfgrid_now, step);
-		mur1_gsscalc_ey(halfgrid_before, halfgrid_now, step);
-
-		//---------------------------------------------------------------------------------------计算磁场
-		mur1_gsscalc_bz(halfgrid_before, halfgrid_now, step);
-		mur1_gsscalc_bx(halfgrid_before, halfgrid_now, step);
-		mur1_gsscalc_by(halfgrid_before, halfgrid_now, step);
-
-
-
-		file << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
-		file << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
-		file << '\n';
+		gss_cal_mur1(halfgrid_now, step);
+		save_result_mur1(halfgrid_now, step);
 
 		cout << "Step--- " << step << " ---has finished." << endl;
 		step++;
-	}//while
-	for (int i = 0; i < Nx - 1; i++)//输出一个横截面的数据
-	{
-		for (int k = 0; k < Nz - 1; k++)
-		{
-			file2 << k << '\t' << i << '\t' << halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t' << halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t' << halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
-		}
 
-	}
+	}//while
+
+	get_plat_mur1(halfgrid_now);
 
 }//函数结尾
 
-void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+ //=========================gss计算调用=========================//
+void gss_cal_mur1(Grid* halfgrid_now, int step)
 {
-	//cout << "源的Ez值---------------->" << halfgrid_now[10 * Ny + 5].ez << endl;
+	//-------------------------------------------------------------------计算电场
+
+	//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
+
+	mur1_gsscalc_ez(halfgrid_now, step);
+	mur1_gsscalc_ex(halfgrid_now, step);
+	mur1_gsscalc_ey(halfgrid_now, step);
+
+	//-------------------------------------------------------------------计算磁场
+	mur1_gsscalc_bz(halfgrid_now, step);
+	mur1_gsscalc_bx(halfgrid_now, step);
+	mur1_gsscalc_by(halfgrid_now, step);
+
+}
+
+//========================gss求解的实现========================//
+void mur1_gsscalc_ez(Grid* halfgrid_now, int step)
+{
 	double aez = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
 	double bez = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
 	double cez = aez;
@@ -100,8 +96,8 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	double setting[32];
 	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//配置参数初始化
 	int type = 0;
-	//----------------------------------------------------------------------------
-	//---------------------------------------------------------------处理ptr数组
+
+	//处理ptr数组
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -110,7 +106,7 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		ptr[i] = ptr[i - 1] + 3;
 	}
 
-	//--------------------------------------------------------------处理ind数组
+	//处理ind数组
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -122,7 +118,7 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//--------------------------------------------------------------val数组处理
+	//val数组处理
 	val[0] = bez;
 	val[2] = cez;
 	val[3 * N - 3] = bez;
@@ -134,10 +130,10 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = cez;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
-	//------------------------------------------------------------生成系数矩阵
+	//生成系数矩阵
 
 	for (int k = 0; k < Nz - 1; k++)
 	{
@@ -147,17 +143,17 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				//首先处理矩阵方程的右端项rhs数组
 				if (i == 0 && j != 0)
-					rhs[i] = bez*halfgrid_before[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].by) / dx - (halfgrid_before[k*Nx*Ny + i*Ny + j].bx - halfgrid_before[k*Nx*Ny + i*Ny + j - 1].bx) / dy);
+					rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / dx - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / dy);
 				else if (j == 0 && i != 0)
-					rhs[i] = aez*halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_before[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].by - halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].by) / dx - (halfgrid_before[k*Nx*Ny + i*Ny + j].bx) / dy);
+					rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / dx - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / dy);
 				else if (i == 0 && j == 0)
-					rhs[i] = bez*halfgrid_before[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].by) / dx - (halfgrid_before[k*Nx*Ny + i*Ny + j].bx) / dy);
+					rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / dx - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / dy);
 				else if (i != 0 && j != 0)
-					rhs[i] = aez*halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_before[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].by - halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].by) / dx - (halfgrid_before[k*Nx*Ny + i*Ny + j].bx - halfgrid_before[k*Nx*Ny + i*Ny + j - 1].bx) / dy);
+					rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / dx - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / dy);
 			}
 
 
@@ -185,23 +181,14 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
-				//对结果进行修正
-				//if (k == 0)//保证不改变源
-				//{
-				//	rhs[i1] = 0.0;
-				//}
-
+				//对结果进行修正								
 				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//处理ez的边界问题，在四个面的位置应该为0
 				{
 					rhs[i1] = 0.0;
 				}
 				//保存结果	
-				halfgrid_before[k*Nx*Ny + i1*Ny + j].ez = halfgrid_now[k*Nx*Ny + i1*Ny + j].ez;
-
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = rhs[i1];
-
 			}
-
 			if (hSolver != NULL)
 				GSS_clear_ld(hSolver);
 
@@ -209,9 +196,8 @@ void mur1_gsscalc_ez(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	}
 }
 
-void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+void mur1_gsscalc_ex(Grid* halfgrid_now, int step)
 {
-	//cout << "源的Ex值---------------->" << halfgrid_now[10 * Ny + 5].ex << endl;
 	double aex = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dy)*(1 / dy));
 	double bex = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dy)*(1 / dy));
 	double cex = aex;
@@ -264,7 +250,7 @@ void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = cex;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -276,17 +262,17 @@ void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				//首先处理矩阵方程的右端项rhs数组
 				if (j == 0 && k != 0)
-					rhs[j] = bex*halfgrid_before[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].ex
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bz) / dy - (halfgrid_before[k*Nx*Ny + i*Ny + j].by - halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
+					rhs[j] = bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
 				else if (k == 0 && j != 0)
-					rhs[j] = aex*halfgrid_before[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_before[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].ex
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bz - halfgrid_before[k*Nx*Ny + i*Ny + j - 1].bz) / dy - (halfgrid_before[k*Nx*Ny + i*Ny + j].by) / dz);
+					rhs[j] = aex*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by) / dz);
 				else if (j == 0 && k == 0)
-					rhs[j] = bex*halfgrid_before[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].ex
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bz) / dy - (halfgrid_before[k*Nx*Ny + i*Ny + j].by) / dz);
+					rhs[j] = bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by) / dz);
 				else if (j != 0 && k != 0)
-					rhs[j] = aex*halfgrid_before[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_before[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].ex
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bz - halfgrid_before[k*Nx*Ny + i*Ny + j - 1].bz) / dy - (halfgrid_before[k*Nx*Ny + i*Ny + j].by - halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
+					rhs[j] = aex*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
 			}//GSS求解
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
@@ -312,17 +298,16 @@ void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
 				//对结果进行修正				
-				if (j1 == 0 || j1 == Ny - 2 || k == 0)//
+				if (j1 == 0 || j1 == Ny - 2|| k == 0)
 				{
 					rhs[j1] = 0.0;
 				}
 				if (k == Nz - 2)
 				{
-					rhs[j1] = halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j1].ex //p0--->k*Nx*Ny + i*Ny + j1, Q0----->(k-1)*Nx*Ny + i*Ny + j1
+					rhs[j1] = halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex //p0--->k*Nx*Ny + i*Ny + j1, Q0----->(k-1)*Nx*Ny + i*Ny + j1
 						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex
-							- halfgrid_before[k*Nx*Ny + i*Ny + j1].ex);
+							- halfgrid_now[k*Nx*Ny + i*Ny + j1].ex);
 				}
-				halfgrid_before[k*Nx*Ny + i*Ny + j1].ex = halfgrid_now[k*Nx*Ny + i*Ny + j1].ex;
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = rhs[j1];
 			}
 
@@ -333,9 +318,8 @@ void mur1_gsscalc_ex(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	}
 }
 
-void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+void mur1_gsscalc_ey(Grid* halfgrid_now, int step)
 {
-	//cout << "源的Ey值---------------->" << halfgrid_now[10 * Ny + 5].ey << endl;
 	double aey = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dz)*(1 / dz));
 	double bey = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dz)*(1 / dz));
 	double cey = aey;
@@ -388,7 +372,7 @@ void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = cey;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -399,17 +383,17 @@ void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			for (int k = 0; k < Nz - 1; k++)
 			{
 				if (k == 0 && i != 0)
-					rhs[k] = bey*halfgrid_before[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].ey
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_before[k*Nx*Ny + i*Ny + j].bz - halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].bz) / dx);
+					rhs[k] = bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / dx);
 				else if (i == 0 && k != 0)
-					rhs[k] = aey*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_before[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].ey
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bx - halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_before[k*Nx*Ny + i*Ny + j].bz) / dx);
+					rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / dx);
 				else if (k == 0 && i == 0)
-					rhs[k] = bey*halfgrid_before[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].ey
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_before[k*Nx*Ny + i*Ny + j].bz) / dx);
+					rhs[k] = bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / dx);
 				else if (k != 0 && i != 0)
-					rhs[k] = aey*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_before[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].ey
-					+ dt*((halfgrid_before[k*Nx*Ny + i*Ny + j].bx - halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_before[k*Nx*Ny + i*Ny + j].bz - halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].bz) / dx);
+					rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / dx);
 			}
 			//GSS求解
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
@@ -427,32 +411,37 @@ void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//必须设置为NULL,GSS已自动释放内存
+				hSolver = NULL;//必须设置为NULL,GSS已自动释放内存
 				exit(0);
 			}
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
-
+			//结果的修正与保存
 			for (int k1 = 0; k1 < Nz - 1; k1++)
 			{
-				if (k1 == 0)
-				{
-					rhs[k1] = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);//不改变源的值
+				if (k1 == 0) //对结果进行修正
+				{//不改变源的值					
+					if (step*dt < 2 * T)
+					{
+						rhs[k1] = ((step*dt) / (2 * T))*((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+					}
+					else
+					{
+						rhs[k1] = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);
+					}
 				}
 				if (k1 == Nz - 2)
 				{
-					rhs[k1]= halfgrid_before[(k1 - 1)*Nx*Ny + i*Ny + j].ey
-						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k1 - 1)*Nx*Ny + i*Ny + j].ey - halfgrid_before[k1*Nx*Ny + i*Ny + j].ey);
+					rhs[k1] = halfgrid_now[(k1 - 1)*Nx*Ny + i*Ny + j].ey
+						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k1 - 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k1*Nx*Ny + i*Ny + j].ey);
+				
 				}
 
-				if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
+				if (i == 0 || i == Nx - 2)
 				{
 					rhs[k1] = 0.0;
 				}
-				//对结果进行修正
-
 				//保存结果
-				halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = rhs[k1];
 			}
 
@@ -462,10 +451,8 @@ void mur1_gsscalc_ey(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	}
 }
 
-
-void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+void mur1_gsscalc_bz(Grid* halfgrid_now, int step)
 {
-	//cout << "源的Bz值---------------->" << halfgrid_now[10 * Ny + 5].bz << endl;
 	double ahz = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dx)*(1 / dx));
 	double bhz = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dx)*(1 / dx));
 	double chz = ahz;
@@ -518,7 +505,7 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = chz;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -530,10 +517,10 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				//首先处理矩阵方程的右端项rhs数组
 				if (i == 0)
-					rhs[i] = bhz*halfgrid_before[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].bz
+					rhs[i] = bhz*halfgrid_now[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].bz
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dy - (halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dx);
 				else
-					rhs[i] = ahz*halfgrid_before[k*Nx*Ny + (i - 1)*Ny + j].bz + bhz*halfgrid_before[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_before[k*Nx*Ny + (i + 1)*Ny + j].bz
+					rhs[i] = ahz*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz + bhz*halfgrid_now[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].bz
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dy - (halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dx);
 			}
 			//GSS求解
@@ -552,7 +539,7 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//必须设置为NULL,GSS已自动释放内存
+				hSolver = NULL;	//必须设置为NULL,GSS已自动释放内存
 				exit(0);
 			}
 
@@ -562,15 +549,21 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				//对结果进行修正				
 				if (k == 0)//不改变输入源的值
 				{
-					rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					if (step*dt < 2 * T)
+					{
+						rhs[i1] = ((step*dt) / (2 * T))*hm*cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					}
+					else
+					{
+						rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+					}
+
 				}
-				//if (k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
+				//   if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
 				//{
 				//	rhs[i1] = 0.0;
 				//}
-
 				//保存结果
-				halfgrid_before[k*Nx*Ny + i1*Ny + j].bz = halfgrid_now[k*Nx*Ny + i1*Ny + j].bz;
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
 			}
 
@@ -581,9 +574,8 @@ void mur1_gsscalc_bz(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 }
 
-void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+void mur1_gsscalc_bx(Grid* halfgrid_now, int step)
 {
-	//cout << "源的Bx值---------------->" << halfgrid_now[10 * Ny + 5].bx << endl;
 	double ahx = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dy)*(1 / dy));
 	double bhx = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dy)*(1 / dy));
 	double chx = ahx;
@@ -636,7 +628,7 @@ void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = chx;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -648,10 +640,10 @@ void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				//首先处理矩阵方程的右端项rhs数组
 				if (j == 0)
-					rhs[j] = bhx*halfgrid_before[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].bx
+					rhs[j] = bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dy);
 				else
-					rhs[j] = ahx*halfgrid_before[k*Nx*Ny + i*Ny + j - 1].bx + bhx*halfgrid_before[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_before[k*Nx*Ny + i*Ny + j + 1].bx
+					rhs[j] = ahx*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx + bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dy);
 			}
 			//GSS求解
@@ -688,7 +680,6 @@ void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				rhs[j1] = 0.0;
 				}	*/
 				//保存结果
-				halfgrid_before[k*Nx*Ny + i*Ny + j1].bx = halfgrid_now[k*Nx*Ny + i*Ny + j1].bx;
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
 			}
 			if (hSolver != NULL)
@@ -698,10 +689,8 @@ void mur1_gsscalc_bx(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 
 }
 
-void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
+void mur1_gsscalc_by(Grid* halfgrid_now, int step)
 {
-	//cout << "源的By值---------------->" << halfgrid_now[10 * Ny + 5].by<< endl;
-	//inject_field(halfgrid_before, halfgrid_now, step);
 	double ahy = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dz)*(1 / dz));
 	double bhy = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dz)*(1 / dz));
 	double chy = ahy;
@@ -754,7 +743,7 @@ void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 		val[i + 4] = chy;
 		j++;
 	}
-	//-----------------------------------------------------------rhs数组初始化
+	//rhs数组初始化
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -766,10 +755,10 @@ void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 			{
 				//首先处理矩阵方程的右端项rhs数组
 				if (k == 0)
-					rhs[k] = bhy*halfgrid_before[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].by
+					rhs[k] = bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
 					+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dx - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dz);
 				else
-					rhs[k] = ahy*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].by + bhy*halfgrid_before[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_before[(k + 1)*Nx*Ny + i*Ny + j].by
+					rhs[k] = ahy*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by + bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
 					+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dx - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dz);
 			}
 			//GSS求解
@@ -807,7 +796,6 @@ void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 				}*/
 
 				//保存结果
-				halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
 
 			}
@@ -817,4 +805,39 @@ void mur1_gsscalc_by(Grid* halfgrid_before, Grid* halfgrid_now, int step)
 	}
 }
 
+
+//==========================保存结果==========================//
+void save_result_mur1(Grid* halfgrid_now, int step)
+{
+	int result_z = 2;
+	int result_x = 10;
+	int result_y = 5;
+
+	file_mur1 << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
+		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey
+		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
+
+	file_mur1 << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx
+		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by
+		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
+
+	file_mur1 << '\n';
+
+}
+
+//=======================输出横截面数据========================//
+void get_plat_mur1(Grid* halfgrid_now)//获取一个截面的数据
+{
+	for (int i = 0; i < Nx - 1; i++)
+	{
+		for (int k = 0; k < Nz - 1; k++)
+		{
+			file_mur1_plat << k << '\t' << i << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
+		}
+	}
+
+}
 #endif

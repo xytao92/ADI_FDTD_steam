@@ -26,17 +26,17 @@ int main()
 
 		case 1:
 		{
-			fdtd_matel(halfgrid_before, halfgrid_now);//进行计算
+			fdtd_matel(halfgrid_now);//进行计算
 			break;
 		}
 		case 2:
 		{
-			adi_fdtd_leapforg_matel_GSS(halfgrid_before, halfgrid_now);//进行计算
+			adi_fdtd_leapforg_matel_GSS(halfgrid_now);//进行计算
 			break;
 		}
 		case 3:
 		{
-			adi_fdtd_leapforg_mur1_GSS(halfgrid_before, halfgrid_now);//进行计算
+			adi_fdtd_leapforg_mur1_GSS(halfgrid_now);//进行计算
 			break;
 		}
 		case 4:
@@ -53,6 +53,10 @@ int main()
 		}
 
 		free(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//保存结果,并释放空间
+		file_matle.close();
+		file_matle_plat.close();
+		file_mur1.close();
+		file_mur1_plat.close();
 
 		clock_t end_time = clock();
 		cout << "Running time: " << static_cast<float>(end_time - start_time) / CLOCKS_PER_SEC << " s" << endl;

@@ -30,10 +30,11 @@ const double dz = Z/(Nz-1); //l方向空间步长
 const double dx = X/(Nx-1); //w方向空间步长
 const double dy = Y/(Ny-1); //h方向空间步长
 
-const double dt = 1.0e-12; // 时间步长,  T=100dt ,T为输入源周期
-const int STEPS = 600; //计算6000个时间步长的数据
+const double dt = 1.0e-12; // 时间步长,  T=100dt ,T为输入源周期稳定性条件要求其小于2.3663e-12
+const int STEPS = 600; //计算600个时间步长的数据
 
-const double freq = 10.0e9; //入射场频率10Ghz
+const double freq = 10.0e9; //入射场频率
+
 const double T = 1/freq; //入射场周期10e-10s
 const double pi = 3.14159265359;
 const double c = 2.99792458e8;
@@ -53,7 +54,11 @@ const double epsl_y = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dz * dz)));
 const double mur_z = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dx * dx)));
 const double mur_x = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dy * dy)));
 const double mur_y = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dz * dz)));
-
+//定义输出文件
+ofstream file_matle("result\\temp_matle_7.txt");
+ofstream file_matle_plat("result\\platform_matle_7.txt");
+ofstream file_mur1("result\\temp_mur1_7.txt");
+ofstream file_mur1_plat("result\\platform_mur1_7.txt");
 
 //class GSS
 //{

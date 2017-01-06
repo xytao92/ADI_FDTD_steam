@@ -41,7 +41,7 @@ void adi_fdtd_leapforg_mur2_GSS(Grid* halfgrid_beforeX2,Grid* halfgrid_before, G
 	while (step < STEPS)
 	{
 
-		inject_field(halfgrid_before, halfgrid_now, step);
+		init_source(halfgrid_now);
 		//---------------------------------------------------------------------------------------计算电场
 		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
 
