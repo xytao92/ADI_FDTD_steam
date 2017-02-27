@@ -58,22 +58,26 @@ void init_source(Grid* halfgrid_now)//计算激励源//
 				//加一个完整的TE10,模式
 
 				//电场
+				double rising_edge = (step*dt) / (2 * T);
 
-				/*halfgrid_now[i*Ny + j].ez = ((step*dt) / (2 * T))*0.0;*/
+				/*halfgrid_now[i*Ny + j].ez = rising_edge * 0.0;*/
 
-				halfgrid_now[i*Ny + j].ex = ((step*dt) / (2 * T))*0.0;		
+				halfgrid_now[i*Ny + j].ex = rising_edge * 0.0;
 
-				halfgrid_now[i*Ny + j].ey = ((step*dt) / (2 * T))*((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt); 
+				double temp_ey = sin((pi / X)*i*dx);
+				halfgrid_now[i*Ny + j].ey = rising_edge * temp_ey * sin(omega*step*dt);
 
 				//磁场
+				/*double temp_bz = hm*cos((pi / X)*i*dx);
+				halfgrid_now[i*Ny + j].bz = rising_edge * temp_bz * cos(omega*step*dt);*/
 
-				halfgrid_now[i*Ny + j].bz = ((step*dt) / (2 * T))*hm*cos((pi / X)*i*dx)*cos(omega*step*dt);
+				/*double temp_bx = (X*bate / pi)*hm*sin((pi / X)*i*dx);*/
 
-				/*halfgrid_now[i*Ny + j].bx = -1 *((step*dt) / (2 * T))* (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);*/
+				/*halfgrid_now[i*Ny + j].bx = -1 * rising_edge * temp_bx * sin(omega*step*dt*1.5);*/
 
-				/*halfgrid_now[i*Ny + j].bx =((step*dt) / (2 * T))*0.0;*/
+				/*halfgrid_now[i*Ny + j].bx = rising_edge * 0.0;*/
 
-				/*halfgrid_now[i*Ny + j].by = ((step*dt) / (2 * T))*0.0;*/
+				/*halfgrid_now[i*Ny + j].by = rising_edge * 0.0;*/
 
 			}
 			else 
@@ -82,13 +86,19 @@ void init_source(Grid* halfgrid_now)//计算激励源//
 				/*halfgrid_now[i*Ny + j].ez = 0.0;*/
 
 				halfgrid_now[i*Ny + j].ex = 0.0;
-				
-				halfgrid_now[i*Ny + j].ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt); //-1 * pi*sin(pi*i*dx / X)*sin(2 * pi*freq*step*dt) / X;//((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+
+				double temp_ey =  sin((pi / X)*i*dx);
+				halfgrid_now[i*Ny + j].ey = temp_ey * sin(omega*step*dt);
+
+				/*double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+				halfgrid_now[i*Ny + j].ey = temp_ey * sin(omega*step*dt); *///-1 * pi*sin(pi*i*dx / X)*sin(2 * pi*freq*step*dt) / X;//((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
 				
 		       //磁场
-				halfgrid_now[i*Ny + j].bz = hm*cos((pi / X)*i*dx)*cos(omega*step*dt);
-				
-				/*halfgrid_now[i*Ny + j].bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);*/
+				/*double temp_bz = hm*cos((pi / X)*i*dx);
+				halfgrid_now[i*Ny + j].bz = temp_bz * cos(omega*step*dt);*/
+
+				/*double temp_bx = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx); */
+				/*halfgrid_now[i*Ny + j].bx = temp_bx * sin(omega*step*dt*1.5);*/
 
 				/*halfgrid_now[i*Ny + j].bx =0.0;*/
 

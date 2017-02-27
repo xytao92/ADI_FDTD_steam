@@ -12,6 +12,7 @@ All Rights Receved
 #include "grid.h"
 #include"functions.h"
 #include"Gss-2.0.h"
+
 //------------------------------------------函数声明
 void mur1_gsscalc_ez(Grid* halfgrid_now, int step);
 void mur1_gsscalc_ex(Grid* halfgrid_now, int step);
@@ -23,20 +24,23 @@ void mur1_gsscalc_by(Grid* halfgrid_now, int step);
 
 void gss_cal_mur1(Grid* halfgrid_now, int step);
 
-void save_result_mur1(Grid* halfgrid_now, int step);
-void get_plat_mur1(Grid* halfgrid_now);
-//=========================输出文件声明=========================//
+
 
 
 //============================总调度============================//
 void adi_fdtd_leapforg_mur1_GSS(Grid* halfgrid_now)
-{
-	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 
-	//注意边界条件的问题，不处理周围的四个面
-    ofstream file_mur1("result\\temp_mur1_7.txt");
-    ofstream file2_mur1("result\\platform_mur1_7.txt");
+{
+	//=========================输出文件声明=========================//
+	ofstream file_mur1("result\\temp_mur1_1500_5_5_5.txt");
+    ofstream file_mur1_plat("result\\platform_mur1_1500_5_5_5.txt");
+
 	int step = 0;//时间步长
+
+	int result_z = 5;
+	int result_x = 5;
+	int result_y = 5;
+
 	init_source(halfgrid_now);//初始化输入源	
 
 	while (step < STEPS)
@@ -44,14 +48,37 @@ void adi_fdtd_leapforg_mur1_GSS(Grid* halfgrid_now)
 		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
 
 		gss_cal_mur1(halfgrid_now, step);
-		save_result_mur1(halfgrid_now, step);
+
+		//==========================保存结果==========================//
+		file_mur1 << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
+
+		file_mur1 << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
+
+		file_mur1 << '\n';
 
 		cout << "Step--- " << step << " ---has finished." << endl;
 		step++;
 
 	}//while
+	file_mur1.close();
 
-	get_plat_mur1(halfgrid_now);
+	//=======================输出横截面数据========================//
+	for (int i = 0; i < Nx - 1; i++)
+	{
+		for (int k = 0; k < Nz - 1; k++)
+		{
+			file_mur1_plat << k << '\t' << i << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
+		}
+	}
+
+	file_mur1_plat.close();
 
 }//函数结尾
 
@@ -298,16 +325,17 @@ void mur1_gsscalc_ex(Grid* halfgrid_now, int step)
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
 				//对结果进行修正				
-				if (j1 == 0 || j1 == Ny - 2|| k == 0)
-				{
-					rhs[j1] = 0.0;
-				}
 				if (k == Nz - 2)
 				{
 					rhs[j1] = halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex //p0--->k*Nx*Ny + i*Ny + j1, Q0----->(k-1)*Nx*Ny + i*Ny + j1
-						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex
-							- halfgrid_now[k*Nx*Ny + i*Ny + j1].ex);
+						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j1].ex);
 				}
+
+				if (j1 == 0 || j1 == Ny - 2 || k == 0)
+				{
+					rhs[j1] = 0.0;
+				}
+
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = rhs[j1];
 			}
 
@@ -423,11 +451,16 @@ void mur1_gsscalc_ey(Grid* halfgrid_now, int step)
 				{//不改变源的值					
 					if (step*dt < 2 * T)
 					{
-						rhs[k1] = ((step*dt) / (2 * T))*((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx) * sin(omega*step*dt);
+						double rising_edge = (step*dt) / (2 * T);
+						double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+
+						rhs[k1] = rising_edge * temp_ey * sin(omega*step*dt);//ey
 					}
 					else
 					{
-						rhs[k1] = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx)*sin(omega*step*dt);
+						double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+
+						rhs[k1] = temp_ey*sin(omega*step*dt);//ey
 					}
 				}
 				if (k1 == Nz - 2)
@@ -549,20 +582,29 @@ void mur1_gsscalc_bz(Grid* halfgrid_now, int step)
 				//对结果进行修正				
 				if (k == 0)//不改变输入源的值
 				{
+					double rising_edge = (step*dt) / (2 * T);
+
 					if (step*dt < 2 * T)
 					{
-						rhs[i1] = ((step*dt) / (2 * T))*hm*cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+						double temp_bz = hm * cos((pi / X) * i1*dx);
+
+						rhs[i1] = rising_edge * temp_bz * cos(omega*step*dt);//hz
 					}
 					else
 					{
-						rhs[i1] = hm * cos((pi / X)*i1*dx)*cos(omega*step*dt*1.5);
+						double temp_bz = hm * cos((pi / X) * i1 * dx);
+
+						rhs[i1] = temp_bz * cos(omega * step * dt);//hz
 					}
 
 				}
-				//   if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
-				//{
-				//	rhs[i1] = 0.0;
-				//}
+				if (k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
+				{
+					/*rhs[i1] = 0.0;*/
+					rhs[i1] = halfgrid_now[(k - 1)*Nx*Ny + i1*Ny + j].bz
+						+ ((c*dt - dz) / (c*dt + dz))*(halfgrid_now[(k - 1)*Nx*Ny + i1*Ny + j].bz - halfgrid_now[k*Nx*Ny + i1*Ny + j].bz);
+
+				}
 				//保存结果
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
 			}
@@ -675,10 +717,10 @@ void mur1_gsscalc_bx(Grid* halfgrid_now, int step)
 				{
 				rhs[j1] = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt*1.5);
 				}*/
-				/*if (i == 0 || i == Nx - 2)
+				if (i == 0 || i == Nx - 2)
 				{
 				rhs[j1] = 0.0;
-				}	*/
+				}	
 				//保存结果
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
 			}
@@ -790,10 +832,10 @@ void mur1_gsscalc_by(Grid* halfgrid_now, int step)
 				{
 				rhs[k1] = 0.0;
 				}*/
-				/*if ( j == 0 || j == Ny - 2)
+				if ( j == 0 || j == Ny - 2)
 				{
-				rhs[k1] = 0.0;
-				}*/
+				   rhs[k1] = 0.0;
+				}
 
 				//保存结果
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
@@ -806,38 +848,6 @@ void mur1_gsscalc_by(Grid* halfgrid_now, int step)
 }
 
 
-//==========================保存结果==========================//
-void save_result_mur1(Grid* halfgrid_now, int step)
-{
-	int result_z = 2;
-	int result_x = 10;
-	int result_y = 5;
-
-	file_mur1 << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
-
-	file_mur1 << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
-
-	file_mur1 << '\n';
-
-}
-
 //=======================输出横截面数据========================//
-void get_plat_mur1(Grid* halfgrid_now)//获取一个截面的数据
-{
-	for (int i = 0; i < Nx - 1; i++)
-	{
-		for (int k = 0; k < Nz - 1; k++)
-		{
-			file_mur1_plat << k << '\t' << i << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
-		}
-	}
 
-}
 #endif

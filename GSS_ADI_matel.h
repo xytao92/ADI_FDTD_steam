@@ -10,8 +10,8 @@ All Rights Receved
 
 #include "definer.h"
 #include "grid.h"
-#include"functions.h"
-#include"Gss-2.0.h"
+#include "functions.h"
+#include "Gss-2.0.h"
 //------------------------------------------函数声明
 void matel_gsscalc_ez(Grid* halfgrid_now, int step);
 void matel_gsscalc_ex(Grid* halfgrid_now, int step);
@@ -20,21 +20,20 @@ void matel_gsscalc_ey(Grid* halfgrid_now, int step);
 void matel_gsscalc_bz(Grid* halfgrid_now, int step);
 void matel_gsscalc_bx(Grid* halfgrid_now, int step);
 void matel_gsscalc_by(Grid* halfgrid_now, int step);
-
-void get_plat_matel(Grid* halfgrid_now);
-void save_result_matel(Grid* halfgrid_now, int step);
 void gss_cal_matel(Grid* halfgrid_now, int step);
-//=========================输出文件声明=========================//
-
 
 //============================总调度============================//
 void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_now)
 {
-	//由于是理想金属的，那么可以在边界处赋值为0，可以直接用gss求解
 
-	//注意边界条件的问题，不处理周围的四个面
+//=========================输出文件声明=========================//
+    ofstream file_matle("result\\matle_400_N2.txt");
+    ofstream file_matle_plat("result\\platform_matle_400_N2.txt");
 
 	int step = 0;//时间步长
+	int result_z = 10;
+	int result_x = 10;
+	int result_y = 5;
 
 	init_source(halfgrid_now);//初始化输入源	
 
@@ -43,13 +42,39 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_now)
 		//基本思想：分别计算六个参量全网格的值，由于计算不需要当前时刻的值，可以分步全局计算
 
 		gss_cal_matel(halfgrid_now,step);
-		save_result_matel(halfgrid_now,step);
+
+		//==========================保存结果==========================//
+		/*file_matle << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey;*/
+
+		file_matle << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
+
+		file_matle << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by
+			<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
+
+		file_matle << '\n';
 
 		cout << "Step--- " << step << " ---has finished." << endl;
 		step++;
 
 	}//while
-	get_plat_matel(halfgrid_now);
+	file_matle.close();
+
+	//=======================输出横截面数据========================//
+	for (int i = 0; i < Nx - 1; i++)
+	{
+		for (int k = 0; k < Nz - 1; k++)
+		{
+			file_matle_plat << k << '\t' << i << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t'
+				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
+		}
+	}
+
+	file_matle_plat.close();
 
 }//函数结尾
 
@@ -340,6 +365,7 @@ void matel_gsscalc_ey(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
+
 	//处理ind数组
 	ind[0] = 0;
 	ind[1] = 1;
@@ -413,18 +439,23 @@ void matel_gsscalc_ey(Grid* halfgrid_now, int step)
 			{
 				if (k1 == 0) //对结果进行修正
 				{//不改变源的值					
-					if (step*dt < 2 * T)
-					{
-						double temp0 = ((2 * pi*freq*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+					//if (step*dt < 2 * T)
+					//{
+					//	double rising_edge = (step*dt) / (2 * T);
+					//	double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
 
-						rhs[k1] = ((step*dt) / (2 * T))*temp0*sin(2 * pi*freq*step*dt);//ey
-					}
-					else
-					{
-						double temp0 = ((2 * pi*freq*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+					//	rhs[k1] = rising_edge * temp_ey * sin(omega*step*dt);//ey
+					//}
+					//else
+					//{
+					//	double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+					//	 
+					//	rhs[k1] = temp_ey*sin(omega*step*dt);//ey
+					//}
+
+						double temp_ey = sin((pi / X)*i*dx);
 						 
-						rhs[k1] = temp0*sin(2 * pi*freq*step*dt);//ey
-					}
+						rhs[k1] = temp_ey*sin(omega*step*dt);//ey
 				}
 				
 				if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
@@ -537,26 +568,28 @@ void matel_gsscalc_bz(Grid* halfgrid_now, int step)
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
 				//对结果进行修正				
-				if (k == 0)//不改变输入源的值
-				{
-					if (step*dt < 2 * T)
-					{
-						double temp2 = hm * cos((pi / X) * i1*dx);
-					
-						rhs[i1]= ((step*dt) / (2 * T)) * temp2 * cos(2 * pi*freq*step*dt);//hz
-					}
-					else
-					{
-						double temp2 = hm * cos((pi / X) * i1*dx);
-
-						rhs[i1] =  temp2 * cos(2 * pi*freq*step*dt);//hz
-					}
-					
-				}
-			 //   if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
+				//if (k == 0)//不改变输入源的值
 				//{
-				//	rhs[i1] = 0.0;
+				//	double rising_edge = (step*dt) / (2 * T);
+
+				//	if (step*dt < 2 * T)
+				//	{
+				//		double temp_bz = hm * cos((pi / X) * i1*dx);
+				//	
+				//		rhs[i1]= rising_edge * temp_bz * cos(omega*step*dt);//hz
+				//	}
+				//	else
+				//	{
+				//		double temp_bz = hm * cos((pi / X) * i1 * dx);
+
+				//		rhs[i1] =  temp_bz * cos(omega * step * dt);//hz
+				//	}
+				//	
 				//}
+			    if ( k == Nz - 2)//在右截面加源而且使其赋值为0，可以相当于理想吸收边界
+				{
+					rhs[i1] = 0.0;
+				}
 				//保存结果
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];								
 			}
@@ -669,10 +702,10 @@ void matel_gsscalc_bx(Grid* halfgrid_now, int step)
 				{
 					rhs[j1] = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
 				}*/
-				/*if (i == 0 || i == Nx - 2)
+				if (i == 0 || i == Nx - 2)
 				{
 					rhs[j1] = 0.0;
-				}	*/							
+				}								
 				//保存结果
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];			
 			}
@@ -784,10 +817,10 @@ void matel_gsscalc_by(Grid* halfgrid_now, int step)
 				{
 					rhs[k1] = 0.0;
 				}*/
-				/*if ( j == 0 || j == Ny - 2)
+				if ( j == 0 || j == Ny - 2)
 				{
 					rhs[k1] = 0.0;
-				}*/
+				}
 				
 				//保存结果
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
@@ -800,38 +833,8 @@ void matel_gsscalc_by(Grid* halfgrid_now, int step)
 }
 
 
-//==========================保存结果==========================//
-void save_result_matel(Grid* halfgrid_now, int step)
-{
-	int result_z = 5;
-	int result_x = 5;
-	int result_y = 5;
 
-	file_matle << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ez << '\t';
 
-	file_matle << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bx
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].by
-		<< '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].bz << '\t';
 
-	file_matle << '\n';
 
-}
-
-//=======================输出横截面数据========================//
-void get_plat_matel(Grid* halfgrid_now)//获取一个截面的数据
-{
-	for (int i = 0; i < Nx - 1; i++)
-	{
-		for (int k = 0; k < Nz - 1; k++)
-		{
-			file_matle_plat << k << '\t' << i << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].ey << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bx << '\t'
-				<< halfgrid_now[k*Nx*Ny + i*Ny + 5].bz << endl;
-		}
-	}
-
-}
 #endif
