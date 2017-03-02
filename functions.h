@@ -6,7 +6,7 @@
 #include "definer.h"
 #include "grid.h"
 
-//==========================初始化网格==========================//
+//============================初始化网格==========================//
 void initGrid(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)//网格的初始化
 {
 	for (int k = 0; k<Nz; k++)
@@ -110,7 +110,7 @@ void init_source(Grid* halfgrid_now)//计算激励源//
 	}
 }
 
-//==========================保存结果==========================//
+//=============================保存结果===========================//
 void save_result(ofstream file, Grid* halfgrid_now, int step)
 {
 	int result_z = 2;
@@ -129,7 +129,7 @@ void save_result(ofstream file, Grid* halfgrid_now, int step)
 
 }
 
-//=======================输出横截面数据========================//
+//=========================输出横截面数据=========================//
 void get_plat(ofstream file2,Grid* halfgrid_now)//获取一个截面的数据
 {
 	for (int i = 0; i < Nx - 1; i++)
@@ -145,7 +145,7 @@ void get_plat(ofstream file2,Grid* halfgrid_now)//获取一个截面的数据
 
 }
 
-//=======================释放空间=======================//
+//============================释放空间===========================//
 void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	delete halfgrid_before;
@@ -154,9 +154,105 @@ void free(Grid* halfgrid_beforeX2,Grid* halfgrid_before, Grid* halfgrid_now)
 	//delete grid_result;
 }
 
+//=======================计算CFL稳定性条件=======================//
+double CFL_calc()
+{
+	double result = 0.0;
+	double v = 1 / (sqrt(epsl0*mur0));
+	double g_temp = sqrt((1 / dx)*(1 / dx) + (1 / dy)*(1 / dy) + (1 / dz)*(1 / dz));
+	result = 1 / (v*g_temp);
+	return result;
+}
+
+//===========================输出理论值=========================//
+int theor_val_gen()
+{
+	clock_t start_time = clock();
+	system("mkdir result\\theor_val");
+	double ex = 0.0;
+	double ey = 0.0;
+	double ez = 0.0;
+	double hx = 0.0;
+	double hy = 0.0;
+	double hz = 0.0;
+	double temp0 = 0.0;
+	double temp1 = 0.0;
+	double temp2 = 0.0;
+
+	int step = 0;
+
+	int result_z = 10;
+	int result_x = 10;
+	int result_y = 5;//1270
+
+	ofstream file(theor_val_filepath);//用于保存结果
+
+	while (step < STEPS)
+	{
+		if (step*dt < 2 * T)
+		{
+			//=============================电场=============================//
+			ex = ((step*dt) / (2 * T))*0.0;//ex
+
+			//double temp0 = ((omega*mur0*X) / pi) * hm * sin((pi / X)*result_x*dx);
+			double temp0 =  hm * sin((pi / X)*result_x*dx);
+			double temp_ey_sin = omega*step*dt - bate*result_z;
+			double temp_ey_font = (step*dt) / (2 * T);
+
+			ey = temp_ey_font * temp0 * sin(temp_ey_sin);//ey
 
 
+			ez = ((step*dt) / (2 * T))*0.0;//ez
 
+			//=============================磁场=============================//
+
+			//double temp1 = (X*bate / pi) * sin((pi / X) * result_x * dx);
+			double temp1 = (bate / (omega*mur0))*sin((pi / X) * result_x * dx);
+			double temp_hx_sin = omega*step*dt - bate*result_z;
+			double temp_hx_font = -1 * (step*dt) / (2 * T) * hm;
+
+			hx = temp_hx_font * temp1 * sin(temp_hx_sin);//hx
+
+			hy = ((step*dt) / (2 * T))*0.0;//hy
+
+			double temp4 = (pi / X) * result_x*dx;
+			double temp2 = (pi / (omega*mur0*X))*hm * cos(temp4);
+			double temp3 = omega*step*dt - bate*result_z;
+			double temp_hz_font = (step*dt) / (2 * T);
+
+			hz = temp_hz_font * temp2 * cos( temp3 );//hz
+		}
+		else
+		{
+			//=============================电场=============================//
+			ex = 0.0;//ex
+			double temp_ey_sin_1 = (pi / X)*result_x*dx;
+			//double temp0 = ((omega*mur0*X) / pi) * hm * sin(temp_ey_sin_1);
+			double temp0 = hm * sin(temp_ey_sin_1);
+			double temp_ey_sin_2 = omega*step*dt - bate*result_z;
+			ey = temp0*sin(temp_ey_sin_2);//ey
+			ez = 0.0;//ez
+			//=============================磁场=============================//
+			double temp_hx_1 = (pi / X) * result_x * dx;
+			//double temp1 = (X*bate / pi)* hm* sin(temp_hx_1);
+			double temp1 = (bate / (omega*mur0))* hm* sin(temp_hx_1);
+			double temp_hx_2 = omega*step*dt - bate*result_z;
+			hx = -1 * temp1 * sin(temp_hx_2);//hx
+			//由于bate会在不同的频率下产生误差会造成相当于输入了两个源
+			hy = 0.0;//hy
+			double temp2 = (pi / (omega*mur0*X))* hm * cos((pi / X) * result_x*dx);
+			double temp_hz_cos = omega*step*dt - bate*result_z;
+			hz = temp2 * cos(temp_hz_cos);//hz
+		}
+		file << step << '\t' << ex << '\t' << ey << '\t' << ez << '\t' << hx << '\t' << hy << '\t' << hz << endl;
+		cout << "STEP---" << step << "  has finished" << endl;
+		step++;
+	}
+	
+	clock_t end_time = clock();
+	cout << "理论值计算所用时间 : " << static_cast<float>(end_time - start_time) / CLOCKS_PER_SEC << " s\n" << endl;
+	return 0;
+}
 
 
 

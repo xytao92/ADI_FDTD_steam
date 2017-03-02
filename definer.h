@@ -30,7 +30,7 @@ const double dz = Z/(Nz-1); //l方向空间步长
 const double dx = X/(Nx-1); //w方向空间步长
 const double dy = Y/(Ny-1); //h方向空间步长
 
-const double dt = 2.0e-12; // CFLN=2,时间步长,  T=100dt ,T为输入源周期稳定性条件要求其小于2.3663e-12,原来是 1.0e-12
+const double dt = 6.45128e-12; // CFLN=2,时间步长,  T=100dt ,T为输入源周期稳定性条件要求其小于6.45128e-12,原来是 1.0e-12
 const int STEPS = 400; //计算600个时间步长的数据
 
 const double freq = 10.0e9; //入射场频率
@@ -55,6 +55,9 @@ const double mur_z = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dx * dx)));
 const double mur_x = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dy * dy)));
 const double mur_y = (mur0 - (dt / 2) * (dt / 2) * ((1 / epsl0) / (dz * dz)));
 //定义输出文件
+const string matle_filepath = "result\\matle_400_N1_ft.txt";
+const string matle_p_filepath = "result\\platform_matle_400_N1_ft.txt";
+const string theor_val_filepath = "result\\theor_val\\source_400_N1_ft.txt";
 
 
 //class GSS

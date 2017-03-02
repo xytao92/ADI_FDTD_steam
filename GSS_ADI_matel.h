@@ -27,8 +27,8 @@ void adi_fdtd_leapforg_matel_GSS(Grid* halfgrid_now)
 {
 
 //=========================输出文件声明=========================//
-    ofstream file_matle("result\\matle_400_N2.txt");
-    ofstream file_matle_plat("result\\platform_matle_400_N2.txt");
+    ofstream file_matle(matle_filepath);
+    ofstream file_matle_plat(matle_p_filepath);
 
 	int step = 0;//时间步长
 	int result_z = 10;
@@ -439,23 +439,22 @@ void matel_gsscalc_ey(Grid* halfgrid_now, int step)
 			{
 				if (k1 == 0) //对结果进行修正
 				{//不改变源的值					
-					//if (step*dt < 2 * T)
-					//{
-					//	double rising_edge = (step*dt) / (2 * T);
-					//	double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
+					if (step*dt < 2 * T)
+					{
+						double rising_edge = (step*dt) / (2 * T);
+						double temp_ey = hm * sin((pi / X)*i*dx);
 
-					//	rhs[k1] = rising_edge * temp_ey * sin(omega*step*dt);//ey
-					//}
-					//else
-					//{
-					//	double temp_ey = ((omega*mur0*X) / pi) * hm * sin((pi / X)*i*dx);
-					//	 
-					//	rhs[k1] = temp_ey*sin(omega*step*dt);//ey
-					//}
-
-						double temp_ey = sin((pi / X)*i*dx);
+						rhs[k1] = rising_edge * temp_ey * sin(omega*step*dt);//ey
+					}
+					else
+					{
+						double temp_ey =  hm * sin((pi / X)*i*dx);
 						 
 						rhs[k1] = temp_ey*sin(omega*step*dt);//ey
+					}
+						//double temp_ey = sin((pi / X)*i*dx);
+						// 
+						//rhs[k1] = temp_ey*sin(omega*step*dt);//ey
 				}
 				
 				if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
