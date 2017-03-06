@@ -163,6 +163,11 @@ double CFL_calc()
 	result = 1 / (v*g_temp);
 	return result;
 }
+double fc_calc()
+{
+	double fc = 1 / (2 * X * sqrt(epsl0*mur0));
+	return fc;
+}
 
 //===========================输出理论值=========================//
 int theor_val_gen()

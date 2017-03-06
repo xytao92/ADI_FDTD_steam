@@ -21,7 +21,7 @@ int main()
 		
 		cout << ">1. 金 属 吸 收 边 界\n" << endl;
 		cout << ">2. Mur 吸 收 边 界\n" << endl;
-		cout << ">3. 计 算 CFL 稳 定 性 条 件 dt\n" << endl;
+		cout << ">3. 计 算 CFL 稳 定 性 条 件 dt 与 截 止 频 率 fc\n" << endl;
 		cout << ">4. 计 算 理 论 值\n" << endl;
 		cout << ">5. 结 束 程 序\n" << endl;
 		cin >> choice;
@@ -47,7 +47,12 @@ int main()
 		case 3:
 		{
 			double result = CFL_calc();
-			cout <<"在满足CFL稳定性条件下: dt <= "<< result << endl;
+			double fc = fc_calc();
+			cout << "计算模型为： \n" << "Z: " << Z << "  Nz: " << Nz << "  dz: " << dz << endl;
+			cout << "X: " << X << "  Nx: " << Nx << "  dx: " << dx << endl;
+			cout << "Y: " << Y << "  Ny: " << Ny << "  dy: " << dy << endl;
+			cout << "此结构下，截止频率fc为： " << fc << endl;
+			cout << "在满足CFL稳定性条件下: dt <= "<< result << endl;
 			cout << '\n' << endl;//进行计算
 			continue;
 		}

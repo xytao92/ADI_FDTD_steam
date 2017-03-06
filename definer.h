@@ -17,12 +17,16 @@
 using namespace std;
 
 //要求使用TE10模式作为强迫性激励源
-
+/*不一定非要用标准的BJ100波导去计算，可取整数长度
+*实验一：Z=0.4,X=0.02,Y=0.01;Nz=401,Nx=21,Ny=11;结果，波形稳定，但是感觉在逐步达到理论幅值，不知后续是不是会一直增加下去。
+*实验二：Z=0.4,X=0.02,Y=0.01;Nz=201,Nx=21,Ny=11;目的看是否dz要是dz,dx的倍数关系。结果：波形稳定，但是感觉在逐步达到理论幅值，不知后续是不是会一直增加下去。
+*实验三：条件同实验二，增加计算步长为600步
+*/
 const double Z = 0.4; //单位m，波导长度，暂且设置的较长以便观察数据
-const double X = 0.2286; //单位m，波导宽度，依据BJ100标准宽度
-const double Y = 0.1016; //单位m, 波导高度，依据BJ100标准高度
+const double X = 0.2; //单位m，波导宽度，依据BJ100标准宽度
+const double Y = 0.1; //单位m, 波导高度，依据BJ100标准高度
 
-const int Nz = 201; //长度方向网格数
+const int Nz = 201; //长度方向网格数 201
 const int Nx = 21;//宽度方向网格数
 const int Ny = 11;//高度方向网格数
 
@@ -30,7 +34,7 @@ const double dz = Z/(Nz-1); //l方向空间步长
 const double dx = X/(Nx-1); //w方向空间步长
 const double dy = Y/(Ny-1); //h方向空间步长
 
-const double dt = 6.45128e-12; // CFLN=2,时间步长,  T=100dt ,T为输入源周期稳定性条件要求其小于6.45128e-12,原来是 1.0e-12
+const double dt = 6.41944e-12; // CFLN=2,时间步长,  T=100dt ,T为输入源周期稳定性条件要求其小于6.45128e-12,原来是 1.0e-12
 const int STEPS = 400; //计算600个时间步长的数据
 
 const double freq = 10.0e9; //入射场频率
