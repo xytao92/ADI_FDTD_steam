@@ -1,7 +1,13 @@
-﻿  正在生成代码
-  40 of 192 functions (20.8%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
-  已完成代码的生成
-  leapforg_ADI_FDTD_steam0.1.vcxproj -> E:\ADI_FDTD\ADI_FDTD_steam\x64\Release\leapforg_ADI_FDTD_steam.exe
-  leapforg_ADI_FDTD_steam0.1.vcxproj -> E:\ADI_FDTD\ADI_FDTD_steam\x64\Release\leapforg_ADI_FDTD_steam.pdb (Full PDB)
+﻿  main.cpp
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(934): error C2065: “aez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(937): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(939): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(940): error C2065: “aez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(943): error C2065: “aez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(944): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(953): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(956): error C2065: “aez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(956): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(959): error C2065: “bez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(962): error C2065: “aez”: 未声明的标识符
+e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(962): error C2065: “bez”: 未声明的标识符

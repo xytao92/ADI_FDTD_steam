@@ -129,11 +129,16 @@
     <ClInclude Include="functions.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="Gss-2.0.h" />
+    <ClInclude Include="GSS_ADI_CPML.h" />
     <ClInclude Include="GSS_ADI_matel.h" />
-    <ClInclude Include="GSS_ADI_mur_2nd.h" />
     <ClInclude Include="GSS_ADI_mur_1st.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="3D_FDTD.cpp" />
+    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="GSS_ADI_CPML.cpp" />
+    <ClCompile Include="GSS_ADI_matel.cpp" />
+    <ClCompile Include="GSS_ADI_mur_1st.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -4,8 +4,9 @@
 #include "grid.h"
 #include "functions.h"
 #include "GSS_ADI_matel.h"
+#include "GSS_ADI_CPML.h"
 #include "GSS_ADI_mur_1st.h"
-#include "GSS_ADI_mur_2nd.h"
+
 #include "3D_FDTD.h"
 
 
@@ -20,7 +21,7 @@ int main()
 		cout << ">>>>>>>>>>>>>请 选 择:<<<<<<<<<<<<\n" << endl;
 		
 		cout << ">1. 金 属 吸 收 边 界\n" << endl;
-		cout << ">2. Mur 吸 收 边 界\n" << endl;
+		cout << ">2. CPML 吸 收 边 界\n" << endl;
 		cout << ">3. 计 算 CFL 稳 定 性 条 件 dt 与 截 止 频 率 fc\n" << endl;
 		cout << ">4. 计 算 理 论 值\n" << endl;
 		cout << ">5. 结 束 程 序\n" << endl;
@@ -41,7 +42,7 @@ int main()
 		}
 		case 2:
 		{
-			adi_fdtd_leapforg_mur1_GSS(halfgrid_now);//进行计算
+			adi_fdtd_leapforg_cpml_GSS(halfgrid_now);//进行计算
 			continue;
 		}
 		case 3:
