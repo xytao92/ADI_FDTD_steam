@@ -46,6 +46,7 @@ const double pi = 3.14159265359;
 const double c = 2.99792458e8;
 const double omega = 2*pi*freq;//角速度//
 
+const double e = 2.71828182845;
 const double epsl0 = 8.854187817e-12;//自由空间介电常数
 const double mur0 = 4.0*pi*1.0e-7;//自由空间磁导率
 const double k0 = omega*sqrt(mur0*epsl0);//自由空间波数//

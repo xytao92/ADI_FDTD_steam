@@ -62,13 +62,11 @@ int main()
 			theor_val_gen();
 			cout << "理论值已产生并存储至---> "<< theor_val_filepath << "\n" << endl;
 			continue;
-
 		}
 		case 5:
 		{
 			cout << ">>>>>>>>程序结束<<<<<<<<" << endl;
 			break;
-
 		}
 		default:
 		{
