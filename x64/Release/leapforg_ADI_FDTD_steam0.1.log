@@ -1,13 +1,14 @@
 ﻿  main.cpp
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(934): error C2065: “aez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(937): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(939): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(940): error C2065: “aez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(943): error C2065: “aez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(944): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(953): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(956): error C2065: “aez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(956): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(959): error C2065: “bez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(962): error C2065: “aez”: 未声明的标识符
-e:\adi_fdtd\adi_fdtd_steam\GSS_ADI_CPML.h(962): error C2065: “bez”: 未声明的标识符
+GSS_ADI_CPML.obj : error LNK2005: "struct Grid * halfgrid_beforeX2" (?halfgrid_beforeX2@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_CPML.obj : error LNK2005: "struct Grid * halfgrid_before" (?halfgrid_before@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_CPML.obj : error LNK2005: "struct Grid * halfgrid_now" (?halfgrid_now@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_matel.obj : error LNK2005: "struct Grid * halfgrid_beforeX2" (?halfgrid_beforeX2@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_matel.obj : error LNK2005: "struct Grid * halfgrid_before" (?halfgrid_before@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_matel.obj : error LNK2005: "struct Grid * halfgrid_now" (?halfgrid_now@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_mur_1st.obj : error LNK2005: "struct Grid * halfgrid_beforeX2" (?halfgrid_beforeX2@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_mur_1st.obj : error LNK2005: "struct Grid * halfgrid_before" (?halfgrid_before@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+GSS_ADI_mur_1st.obj : error LNK2005: "struct Grid * halfgrid_now" (?halfgrid_now@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+main.obj : error LNK2005: "struct Grid * halfgrid_beforeX2" (?halfgrid_beforeX2@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+main.obj : error LNK2005: "struct Grid * halfgrid_before" (?halfgrid_before@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+main.obj : error LNK2005: "struct Grid * halfgrid_now" (?halfgrid_now@@3PEAUGrid@@EA) 已经在 functions.obj 中定义
+E:\ADI_FDTD\ADI_FDTD_steam\x64\Release\leapforg_ADI_FDTD_steam.exe : fatal error LNK1169: 找到一个或多个多重定义的符号

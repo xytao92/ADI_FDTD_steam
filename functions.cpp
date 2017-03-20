@@ -1,5 +1,4 @@
 #include"functions.h"
-
 //============================初始化网格==========================//
 void initGrid(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now)//网格的初始化
 {

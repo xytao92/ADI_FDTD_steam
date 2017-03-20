@@ -33,10 +33,10 @@
     <ClInclude Include="GSS_ADI_mur_1st.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="3D_FDTD.h">
+    <ClInclude Include="GSS_ADI_CPML.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="GSS_ADI_CPML.h">
+    <ClInclude Include="3D_FDTD.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,14 +1,10 @@
 ﻿//writen by liuzhichao 
 //2016/10/8
 #include "definer.h"
-#include "grid.h"
 #include "functions.h"
 #include "GSS_ADI_matel.h"
 #include "GSS_ADI_CPML.h"
 #include "GSS_ADI_mur_1st.h"
-
-#include "3D_FDTD.h"
-
 
 int main()
 {
@@ -30,11 +26,6 @@ int main()
 		switch (choice)
 		{
 
-		case 0:
-		{
-			fdtd_matel(halfgrid_now);//进行计算
-			continue;
-		}
 		case 1:
 		{
 			adi_fdtd_leapforg_matel_GSS(halfgrid_now);//进行计算
