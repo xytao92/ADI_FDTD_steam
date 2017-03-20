@@ -116,6 +116,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,11 +135,6 @@
     <ClInclude Include="GSS_ADI_mur_1st.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="3D_FDTD.cpp" />
-    <ClCompile Include="functions.cpp" />
-    <ClCompile Include="GSS_ADI_CPML.cpp" />
-    <ClCompile Include="GSS_ADI_matel.cpp" />
-    <ClCompile Include="GSS_ADI_mur_1st.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

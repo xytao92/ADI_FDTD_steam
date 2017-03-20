@@ -1,6 +1,6 @@
 ﻿//writen by liuzhichao 
 //2016/10/8
-#include "definer.h"
+
 #include "functions.h"
 #include "GSS_ADI_matel.h"
 #include "GSS_ADI_CPML.h"

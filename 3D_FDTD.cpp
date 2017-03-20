@@ -1,4 +1,6 @@
 #include"3D_FDTD.h"
+#include"functions.h"
+#include"Gss-2.0.h"
 void fdtd_matel(Grid* halfgrid_now)
 {
 	//system("mkdir result");
@@ -54,7 +56,6 @@ void fdtd_matel(Grid* halfgrid_now)
 	}
 
 }//º¯Êý½áÎ²
-
 
 void fdtd_bz(Grid* halfgrid_now, int step)
 {

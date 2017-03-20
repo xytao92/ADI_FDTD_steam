@@ -2,7 +2,7 @@
 //2016/10/8
 #ifndef _GRID_
 #define _GRID_
-#include"definer.h"
+
 struct Grid	
 {
     double ex,ey,ez;//电场强度

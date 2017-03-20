@@ -1,4 +1,7 @@
 #include"GSS_ADI_mur_1st.h"
+#include"functions.h"
+#include"Gss-2.0.h"
+
 
 //============================×Üµ÷¶È============================//
 void adi_fdtd_leapforg_mur1_GSS(Grid* halfgrid_now)

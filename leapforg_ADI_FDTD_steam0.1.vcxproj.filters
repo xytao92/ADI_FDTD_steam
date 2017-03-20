@@ -44,21 +44,6 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="functions.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="GSS_ADI_CPML.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="GSS_ADI_matel.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="GSS_ADI_mur_1st.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="3D_FDTD.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="GSS_DLL_6D.dll">
