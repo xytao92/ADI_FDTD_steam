@@ -26,7 +26,7 @@ void free(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now);
 double CFL_calc();
 double fc_calc();
 //===========================输出理论值=========================//
-int theor_val_gen();
+void theor_val_gen();
 
 
 
@@ -161,9 +161,8 @@ double fc_calc()
 }
 
 //===========================输出理论值=========================//
-int theor_val_gen()
+void theor_val_gen()
 {
-	clock_t start_time = clock();
 	system("mkdir result\\theor_val");
 	double ex = 0.0;
 	double ey = 0.0;
@@ -175,7 +174,7 @@ int theor_val_gen()
 	double temp1 = 0.0;
 	double temp2 = 0.0;
 
-	int step = 5;
+	int step = 0;
 
 	int result_z = 10;
 	int result_x = 10;
@@ -190,9 +189,9 @@ int theor_val_gen()
 			//=============================电场=============================//
 			ex = ((step*dt) / (2 * T))*0.0;//ex
 
-										   //double temp0 = ((omega*mur0*X) / pi) * hm * sin((pi / X)*result_x*dx);
+			//double temp0 = ((omega*mur0*X) / pi) * hm * sin((pi / X)*result_x*dx);
 			double temp0 = hm * sin((pi / X)*result_x*dx);
-			double temp_ey_sin = omega*step*dt - bate*result_z;
+			double temp_ey_sin = omega*step*dt - bate*result_z*dz;
 			double temp_ey_font = (step*dt) / (2 * T);
 
 			ey = temp_ey_font * temp0 * sin(temp_ey_sin);//ey
@@ -200,11 +199,11 @@ int theor_val_gen()
 
 			ez = ((step*dt) / (2 * T))*0.0;//ez
 
-										   //=============================磁场=============================//
+           //=============================磁场=============================//
 
-										   //double temp1 = (X*bate / pi) * sin((pi / X) * result_x * dx);
+	       //double temp1 = (X*bate / pi) * sin((pi / X) * result_x * dx);
 			double temp1 = (bate / (omega*mur0))*sin((pi / X) * result_x * dx);
-			double temp_hx_sin = omega*step*dt - bate*result_z;
+			double temp_hx_sin = omega*step*dt - bate*result_z*dz;
 			double temp_hx_font = -1 * (step*dt) / (2 * T) * hm;
 
 			hx = temp_hx_font * temp1 * sin(temp_hx_sin);//hx
@@ -213,7 +212,7 @@ int theor_val_gen()
 
 			double temp4 = (pi / X) * result_x*dx;
 			double temp2 = (pi / (omega*mur0*X))*hm * cos(temp4);
-			double temp3 = omega*step*dt - bate*result_z;
+			double temp3 = omega*step*dt - bate*result_z*dz;
 			double temp_hz_font = (step*dt) / (2 * T);
 
 			hz = temp_hz_font * temp2 * cos(temp3);//hz
@@ -225,29 +224,25 @@ int theor_val_gen()
 			double temp_ey_sin_1 = (pi / X)*result_x*dx;
 			//double temp0 = ((omega*mur0*X) / pi) * hm * sin(temp_ey_sin_1);
 			double temp0 = hm * sin(temp_ey_sin_1);
-			double temp_ey_sin_2 = omega*step*dt - bate*result_z;
+			double temp_ey_sin_2 = omega*step*dt - bate*result_z*dz;
 			ey = temp0*sin(temp_ey_sin_2);//ey
 			ez = 0.0;//ez
 					 //=============================磁场=============================//
 			double temp_hx_1 = (pi / X) * result_x * dx;
 			//double temp1 = (X*bate / pi)* hm* sin(temp_hx_1);
 			double temp1 = (bate / (omega*mur0))* hm* sin(temp_hx_1);
-			double temp_hx_2 = omega*step*dt - bate*result_z;
+			double temp_hx_2 = omega*step*dt - bate*result_z*dz;
 			hx = -1 * temp1 * sin(temp_hx_2);//hx
 											 //由于bate会在不同的频率下产生误差会造成相当于输入了两个源
 			hy = 0.0;//hy
 			double temp2 = (pi / (omega*mur0*X))* hm * cos((pi / X) * result_x*dx);
-			double temp_hz_cos = omega*step*dt - bate*result_z;
+			double temp_hz_cos = omega*step*dt - bate*result_z*dz;
 			hz = temp2 * cos(temp_hz_cos);//hz
 		}
 		file << step << '\t' << ex << '\t' << ey << '\t' << ez << '\t' << hx << '\t' << hy << '\t' << hz << endl;
 		cout << "STEP---" << step << "  has finished" << endl;
 		step++;
 	}
-
-	clock_t end_time = clock();
-	cout << "理论值计算所用时间 : " << static_cast<float>(end_time - start_time) / CLOCKS_PER_SEC << " s\n" << endl;
-	return 0;
 }
 
 

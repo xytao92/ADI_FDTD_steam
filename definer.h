@@ -30,7 +30,8 @@ const double Y = 0.1; //单位m, 波导高度，依据BJ100标准高度
 const int Nz = static_cast<int>((200*1.05)+1); //长度方向网格数 201，再加上吸收边界的10层，为211层
 const int Nx = 21;//宽度方向网格数
 const int Ny = 11;//高度方向网格数
-const int s0 = 200;//开始加吸收边界的位置
+const int s0 = 199;//开始加吸收边界的位置
+const int Nz_size = Nz - s0 - 2;
 
 const double dz = Z/(Nz-1); //l方向空间步长
 const double dx = X/(Nx-1); //w方向空间步长
@@ -52,7 +53,7 @@ const double mur0 = 4.0*pi*1.0e-7;//自由空间磁导率
 const double k0 = omega*sqrt(mur0*epsl0);//自由空间波数//
 const double kc = pi/X; //TE10模截止波数//
 const double bate = sqrt(omega*omega*mur0*epsl0 - (pi/X)*(pi/X));
-const double hm = 1.0;
+const double hm = 10.0;
 
 const double epsl_z = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dx * dx)));
 const double epsl_x = (epsl0 - (dt / 2) * (dt / 2) * ((1 / mur0) / (dy * dy)));
