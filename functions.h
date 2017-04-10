@@ -8,7 +8,7 @@
 #include "grid.h"
 
 //============================初始化网格=========================//
-void initGrid(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now);
+void initGrid(Grid* halfgrid_before, Grid* halfgrid_now);
 
 //==========================初始化输入源=========================//
 void init_source(Grid* halfgrid_now);
@@ -20,7 +20,7 @@ void save_result(ofstream file, Grid* halfgrid_now, int step);
 void get_plat(ofstream file2, Grid* halfgrid_now);
 
 //============================释放空间==========================//
-void free(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now);
+void free(Grid* halfgrid_before, Grid* halfgrid_now);
 
 //=======================计算CFL稳定性条件======================//
 double CFL_calc();
@@ -33,7 +33,7 @@ void theor_val_gen();
 
 
 //============================初始化网格==========================//
-void initGrid(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now)//网格的初始化
+void initGrid(Grid* halfgrid_before, Grid* halfgrid_now)//网格的初始化
 {
 	for (int k = 0; k<Nz; k++)
 		for (int i = 0; i<Nx; i++)
@@ -104,7 +104,7 @@ void init_source(Grid* halfgrid_now)//初始化激励源//
 //=============================保存结果===========================//
 void save_result(ofstream file, Grid* halfgrid_now, int step)
 {
-	int result_z = 2;
+	int result_z = 10;
 	int result_x = 10;
 	int result_y = 5;
 
@@ -137,11 +137,10 @@ void get_plat(ofstream file2, Grid* halfgrid_now)//获取一个截面的数据
 }
 
 //============================释放空间===========================//
-void free(Grid* halfgrid_beforeX2, Grid* halfgrid_before, Grid* halfgrid_now)
+void free( Grid* halfgrid_before, Grid* halfgrid_now)
 {
 	delete halfgrid_before;
 	delete halfgrid_now;
-	delete halfgrid_beforeX2;
 	//delete grid_result;
 }
 
@@ -154,6 +153,7 @@ double CFL_calc()
 	result = 1 / (v*g_temp);
 	return result;
 }
+
 double fc_calc()
 {
 	double fc = 1 / (2 * X * sqrt(epsl0*mur0));

@@ -1,8 +1,11 @@
-/*
+ï»¿/*
 Writen By LiuZhiChao
 on time: 2017.3.14
 All Rights Receved
 */
+
+//2017.03.30ï¼Œæ£€æŸ¥å¹¶ä¿®æ­£ byåˆ˜æ™ºè¶…
+//2014.04.10.ç†æƒ³å¸æ”¶è¾¹ç•Œçš„ç½‘æ ¼é—®é¢˜å·²ç»è§£å†³ï¼Œæ£€éªŒCPMLè®¡ç®—æ˜¯å¦æ­£ç¡®
 
 #ifndef _GSS_ADI_CPPML_
 #define _GSS_ADI_CPPML_
@@ -10,29 +13,29 @@ All Rights Receved
 #include"grid.h"
 #include "functions.h"
 #include "Gss-2.0.h"
-//------------------------------------------º¯ÊıÉùÃ÷
-void adi_fdtd_leapforg_cpml_GSS(Grid* halfgrid_now);
+//------------------------------------------å‡½æ•°å£°æ˜
+void adi_fdtd_leapforg_cpml_GSS(Grid* halfgrid_now, Grid* halfgrid_before);
 //void gss_cal_cpml(Grid* halfgrid_now, int step);
 
 void norm_gsscalc_ez(Grid* halfgrid_now, int step);
 void norm_gsscalc_ex(Grid* halfgrid_now, int step);
-void norm_gsscalc_ey(Grid* halfgrid_now, int step);
+void norm_gsscalc_ey(Grid* halfgrid_now, Grid* halfgrid_before, int step);
 
 void norm_gsscalc_bz(Grid* halfgrid_now, int step);
 void norm_gsscalc_bx(Grid* halfgrid_now, int step);
-void norm_gsscalc_by(Grid* halfgrid_now, int step);
+void norm_gsscalc_by(Grid* halfgrid_now, Grid* halfgrid_before, int step);
 
 void cpml_gsscalc_ez(Grid* halfgrid_now, int step);
 void cpml_gsscalc_ex(Grid* halfgrid_now, int step);
-void cpml_gsscalc_ey(Grid* halfgrid_now, int step);
+void cpml_gsscalc_ey(Grid* halfgrid_now, Grid* halfgrid_before, int step);
 
 void cpml_gsscalc_bz(Grid* halfgrid_now, int step);
 void cpml_gsscalc_bx(Grid* halfgrid_now, int step);
-void cpml_gsscalc_by(Grid* halfgrid_now, int step);
+void cpml_gsscalc_by(Grid* halfgrid_now, Grid* halfgrid_before, int step);
 
 
-//-------------³£Á¿ÉùÃ÷
-//CPML³£Êı²¿·Ö
+//-------------å¸¸é‡å£°æ˜
+//CPMLå¸¸æ•°éƒ¨åˆ†
 const int kxmax = 8;
 const int kymax = 8;
 const int kzmax = 8;
@@ -46,19 +49,19 @@ const double alpha_ymax = 0.05;
 const double sigma_zmax = (4 + 1) / (150 * pi*dz);
 const double alpha_zmax = 0.05;
 
-const double d = (Nz - s0 - 2) * dz;//cpml²ãµÄ×Üºñ¶È
+const double d = (Nz - s0 - 2) * dz;//cpmlå±‚çš„æ€»åšåº¦
 
 
 
-//TODO:  ×Üµ÷¶È============================//
-void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
+//TODO:  æ€»è°ƒåº¦============================//
+void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now, Grid* halfgrid_before)
 {
 
-	//=========================Êä³öÎÄ¼şÉùÃ÷=========================//
+	//=========================è¾“å‡ºæ–‡ä»¶å£°æ˜=========================//
 	ofstream file_matle(cpml_filepath);
 	ofstream file_matle_plat(cpml_p_filepath);
 
-	int step = 0;//Ê±¼ä²½³¤
+	int step = 0;//æ—¶é—´æ­¥é•¿
 	int result_z = 10;//10,10,5
 	int result_x = 10;
 	int result_y = 5;
@@ -66,7 +69,7 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 
 	while (step < STEPS)
 	{
-		//»ù±¾Ë¼Ïë£º·Ö±ğ¼ÆËãÁù¸ö²ÎÁ¿È«Íø¸ñµÄÖµ£¬ÓÉÓÚ¼ÆËã²»ĞèÒªµ±Ç°Ê±¿ÌµÄÖµ£¬¿ÉÒÔ·Ö²½È«¾Ö¼ÆËã
+		//åŸºæœ¬æ€æƒ³ï¼šåˆ†åˆ«è®¡ç®—å…­ä¸ªå‚é‡å…¨ç½‘æ ¼çš„å€¼ï¼Œç”±äºè®¡ç®—ä¸éœ€è¦å½“å‰æ—¶åˆ»çš„å€¼ï¼Œå¯ä»¥åˆ†æ­¥å…¨å±€è®¡ç®—
 
 		norm_gsscalc_ez(halfgrid_now, step);
 		cpml_gsscalc_ez(halfgrid_now, step);
@@ -74,20 +77,20 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 		norm_gsscalc_ex(halfgrid_now, step);
 		cpml_gsscalc_ex(halfgrid_now, step);
 
-		norm_gsscalc_ey(halfgrid_now, step);
-		cpml_gsscalc_ey(halfgrid_now, step);
+		norm_gsscalc_ey(halfgrid_now, halfgrid_before,step);
+		cpml_gsscalc_ey(halfgrid_now, halfgrid_before,step);
 
-		//-------------------------------------------------------------------¼ÆËã´Å³¡
+		//-------------------------------------------------------------------è®¡ç®—ç£åœº
 		norm_gsscalc_bz(halfgrid_now, step);
 		cpml_gsscalc_bz(halfgrid_now, step);
 
 		norm_gsscalc_bx(halfgrid_now, step);
 		cpml_gsscalc_bx(halfgrid_now, step);
 
-		norm_gsscalc_by(halfgrid_now, step);
-		cpml_gsscalc_by(halfgrid_now, step);
+		norm_gsscalc_by(halfgrid_now, halfgrid_before,step);
+		cpml_gsscalc_by(halfgrid_now, halfgrid_before,step);
 
-		//==========================±£´æ½á¹û==========================//
+		//==========================ä¿å­˜ç»“æœ==========================//
 		/*file_matle << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ey;*/
 
 		file_matle << step << '\t' << halfgrid_now[result_z * Nx*Ny + result_x * Ny + result_y].ex
@@ -106,7 +109,7 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 	}//while
 	file_matle.close();
 
-	//=======================Êä³öºá½ØÃæÊı¾İ========================//
+	//=======================è¾“å‡ºæ¨ªæˆªé¢æ•°æ®========================//
 	for (int i = 0; i < Nx - 1; i++)
 	{
 		for (int k = 0; k < Nz - 1; k++)
@@ -120,14 +123,14 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 
 	file_matle_plat.close();
 
-}//º¯Êı½áÎ²
+}//å‡½æ•°ç»“å°¾
 
- //TODO:  gss¼ÆËãµ÷ÓÃ=========================//
+ //TODO:  gssè®¡ç®—è°ƒç”¨=========================//
 //void gss_cal_cpml(Grid* halfgrid_now, int step)
 //{
-//	//-------------------------------------------------------------------¼ÆËãµç³¡
+//	//-------------------------------------------------------------------è®¡ç®—ç”µåœº
 //
-//	//»ù±¾Ë¼Ïë£º·Ö±ğ¼ÆËãÁù¸ö²ÎÁ¿È«Íø¸ñµÄÖµ£¬ÓÉÓÚ¼ÆËã²»ĞèÒªµ±Ç°Ê±¿ÌµÄÖµ£¬¿ÉÒÔ·Ö²½È«¾Ö¼ÆËã
+//	//åŸºæœ¬æ€æƒ³ï¼šåˆ†åˆ«è®¡ç®—å…­ä¸ªå‚é‡å…¨ç½‘æ ¼çš„å€¼ï¼Œç”±äºè®¡ç®—ä¸éœ€è¦å½“å‰æ—¶åˆ»çš„å€¼ï¼Œå¯ä»¥åˆ†æ­¥å…¨å±€è®¡ç®—
 //
 //	norm_gsscalc_ez(halfgrid_now, step);
 //	cpml_gsscalc_ez(halfgrid_now, step);
@@ -138,7 +141,7 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 //	norm_gsscalc_ey(halfgrid_now, step);
 //	cpml_gsscalc_ey(halfgrid_now, step);
 //
-//	//-------------------------------------------------------------------¼ÆËã´Å³¡
+//	//-------------------------------------------------------------------è®¡ç®—ç£åœº
 //	norm_gsscalc_bz(halfgrid_now, step);
 //	cpml_gsscalc_bz(halfgrid_now, step);
 //
@@ -150,14 +153,14 @@ void adi_fdtd_leapforg_cpml_GSS(Grid *halfgrid_now)
 //
 //}
 
-//TODO:  gssÇó½âµÄÊµÏÖ//
+//TODO:  gssæ±‚è§£çš„å®ç°//
 void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 {
 	double aez = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
 	double bez = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dx)*(1 / dx));
 	double cez = aez;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	int N = Nx - 1;
 
 	int nnz = 3 * N - 2;
@@ -169,12 +172,12 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 	double val[3 * (Nx - 1) - 2];
 	double rhs[Nx - 1];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -183,7 +186,7 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 		ptr[i] = ptr[i - 1] + 3;
 	}
 
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -195,7 +198,7 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bez;
 	val[2] = cez;
 	val[3 * N - 3] = bez;
@@ -207,10 +210,10 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 		val[i + 4] = cez;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
-	//Éú³ÉÏµÊı¾ØÕó
+	//ç”Ÿæˆç³»æ•°çŸ©é˜µ
 
 	for (int k = 0; k <= s0; k++)
 	{
@@ -218,7 +221,7 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 		{
 			for (int i = 0; i < Nx - 1; i++)
 			{
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (i == 0 && j != 0)
 					rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / dx - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / dy);
@@ -234,7 +237,7 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 			}
 
 
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -250,7 +253,7 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -258,12 +261,12 @@ void norm_gsscalc_ez(Grid* halfgrid_now, int step)
 
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı								
-				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//´¦ÀíezµÄ±ß½çÎÊÌâ£¬ÔÚËÄ¸öÃæµÄÎ»ÖÃÓ¦¸ÃÎª0
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£								
+				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//å¤„ç†ezçš„è¾¹ç•Œé—®é¢˜ï¼Œåœ¨å››ä¸ªé¢çš„ä½ç½®åº”è¯¥ä¸º0
 				{
 					rhs[i1] = 0.0;
 				}
-				//±£´æ½á¹û	
+				//ä¿å­˜ç»“æœ	
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = rhs[i1];
 			}
 			if (hSolver != NULL)
@@ -279,7 +282,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 	double bex = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dy)*(1 / dy));
 	double cex = aex;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	int N = Ny - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -290,12 +293,12 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 	double val[3 * (Ny - 1) - 2];
 	double rhs[Ny - 1];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -303,7 +306,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -315,7 +318,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bex;
 	val[2] = cex;
 	val[3 * N - 3] = bex;
@@ -327,7 +330,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 		val[i + 4] = cex;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -337,7 +340,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 		{
 			for (int j = 0; j < Ny - 1; j++)
 			{
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (j == 0 && k != 0)
 					rhs[j] = bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
@@ -350,7 +353,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 				else if (j != 0 && k != 0)
 					rhs[j] = aex*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bz) / dy - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / dz);
-			}//GSSÇó½â
+			}//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -366,7 +369,7 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -374,8 +377,8 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı				
-				if (j1 == 0 || j1 == Ny - 2 || k == 0)//´Ë´¦²»Ó¦¸ÃÔÙ´¦ÀíÓÒ¶Ë±ß½ç
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£				
+				if (j1 == 0 || j1 == Ny - 2 || k == 0)//æ­¤å¤„ä¸åº”è¯¥å†å¤„ç†å³ç«¯è¾¹ç•Œ
 				{
 					rhs[j1] = 0.0;
 				}
@@ -389,13 +392,13 @@ void norm_gsscalc_ex(Grid* halfgrid_now, int step)
 	}
 }
 
-void norm_gsscalc_ey(Grid* halfgrid_now, int step)
+void norm_gsscalc_ey(Grid* halfgrid_now, Grid* halfgrid_before,int step)
 {
 	double aey = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dz)*(1 / dz));
 	double bey = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / dz)*(1 / dz));
 	double cey = aey;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = s0+1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -406,12 +409,12 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 	double val[3 * N - 2];
 	double rhs[N];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -420,7 +423,7 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 		ptr[i] = ptr[i - 1] + 3;
 	}
 
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -432,7 +435,7 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bey;
 	val[2] = cey;
 	val[3 * N - 3] = bey;
@@ -444,7 +447,7 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 		val[i + 4] = cey;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -467,7 +470,7 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 					rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / dx);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -483,16 +486,16 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
-			//½á¹ûµÄĞŞÕıÓë±£´æ
+			//ç»“æœçš„ä¿®æ­£ä¸ä¿å­˜
 			for (int k1 = 0; k1 <=s0 ; k1++)
 			{
-				if (k1 == 0) //¶Ô½á¹û½øĞĞĞŞÕı
-				{//²»¸Ä±äÔ´µÄÖµ					
+				if (k1 == 0) //å¯¹ç»“æœè¿›è¡Œä¿®æ­£
+				{//ä¸æ”¹å˜æºçš„å€¼					
 					if (step*dt < 2 * T)
 					{
 						double rising_edge = (step*dt) / (2 * T);
@@ -511,11 +514,15 @@ void norm_gsscalc_ey(Grid* halfgrid_now, int step)
 					//rhs[k1] = temp_ey*sin(omega*step*dt);//ey
 				}
 
-				if (i == 0 || i == Nx - 2)//´Ë´¦²»Ó¦¸ÃÔÙ´¦ÀíÓÒ¶Ë±ß½ç
+				if (i == 0 || i == Nx - 2)//æ­¤å¤„ä¸åº”è¯¥å†å¤„ç†å³ç«¯è¾¹ç•Œ
 				{
 					rhs[k1] = 0.0;
 				}
-				//±£´æ½á¹û
+				//ä¿å­˜ç»“æœ
+				if (k1 == s0)//ä¿å­˜ç‰¹å®šçš„eyå€¼ï¼Œæ–¹ä¾¿åç»­cpmlæ±‚è§£
+				{
+					halfgrid_before[k1*Nx*Ny + i*Ny + j].ey = halfgrid_now[k1*Nx*Ny + i*Ny + j].ey;
+				}
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = rhs[k1];
 			}
 
@@ -531,7 +538,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 	double bhz = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dx)*(1 / dx));
 	double chz = ahz;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	int N = Nx - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -542,12 +549,12 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 	double val[3 * (Nx - 1) - 2];
 	double rhs[Nx - 1];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -555,7 +562,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -567,7 +574,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bhz;
 	val[2] = chz;
 	val[3 * N - 3] = bhz;
@@ -579,7 +586,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 		val[i + 4] = chz;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -589,7 +596,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 		{
 			for (int i = 0; i < Nx - 1; i++)
 			{
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (i == 0)
 					rhs[i] = bhz*halfgrid_now[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].bz
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dy - (halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dx);
@@ -597,7 +604,7 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 					rhs[i] = ahz*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz + bhz*halfgrid_now[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].bz
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dy - (halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dx);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -613,15 +620,15 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;	//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;	//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı				
-				//if (k == 0)//²»¸Ä±äÊäÈëÔ´µÄÖµ
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£				
+				//if (k == 0)//ä¸æ”¹å˜è¾“å…¥æºçš„å€¼
 				//{
 				//	double rising_edge = (step*dt) / (2 * T);
 
@@ -639,11 +646,11 @@ void norm_gsscalc_bz(Grid* halfgrid_now, int step)
 				//	}
 				//	
 				//}
-				//if (k == Nz - 2)//¶ÔÓÒ½ØÃæ²»½øĞĞ´¦Àí£¬Áô¸øºó±ßµÄcpml´¦Àí
+				//if (k == Nz - 2)//å¯¹å³æˆªé¢ä¸è¿›è¡Œå¤„ç†ï¼Œç•™ç»™åè¾¹çš„cpmlå¤„ç†
 				//{
 				//	rhs[i1] = 0.0;
 				//}
-				//±£´æ½á¹û
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
 			}
 
@@ -660,7 +667,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 	double bhx = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dy)*(1 / dy));
 	double chx = ahx;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	int N = Ny - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -671,12 +678,12 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 	double val[3 * (Ny - 1) - 2];
 	double rhs[Ny - 1];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -684,7 +691,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -696,7 +703,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bhx;
 	val[2] = chx;
 	val[3 * N - 3] = bhx;
@@ -708,7 +715,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 		val[i + 4] = chx;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -718,7 +725,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 		{
 			for (int j = 0; j < Ny - 1; j++)
 			{
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (j == 0)
 					rhs[j] = bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dy);
@@ -726,7 +733,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 					rhs[j] = ahx*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx + bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / dz - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dy);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -742,7 +749,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -750,7 +757,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£
 				/*if (k == 0)
 				{
 				rhs[j1] = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
@@ -759,7 +766,7 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 				{
 					rhs[j1] = 0.0;
 				}
-				//±£´æ½á¹û
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
 			}
 			if (hSolver != NULL)
@@ -769,13 +776,13 @@ void norm_gsscalc_bx(Grid* halfgrid_now, int step)
 
 }
 
-void norm_gsscalc_by(Grid* halfgrid_now, int step)
+void norm_gsscalc_by(Grid* halfgrid_now, Grid* halfgrid_before,int step)
 {
 	double ahy = (-1 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dz)*(1 / dz));
 	double bhy = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / epsl0)*(1 / dz)*(1 / dz));
 	double chy = ahy;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = s0 + 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -786,12 +793,12 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 	double val[3 * N - 2];
 	double rhs[N];
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
-	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	for (int i = 0; i < 32; i++)	setting[i] = 0.0;//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -799,7 +806,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -811,7 +818,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 	val[0] = bhy;
 	val[2] = chy;
 	val[3 * N - 3] = bhy;
@@ -823,7 +830,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 		val[i + 4] = chy;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -833,7 +840,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 		{
 			for (int k = 0; k <= s0; k++)
 			{
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (k == 0)
 					rhs[k] = bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
 					+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dx - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dz);
@@ -841,7 +848,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 					rhs[k] = ahy*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by + bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
 					+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dx - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dz);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -857,7 +864,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -865,7 +872,7 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 
 			for (int k1 = 0; k1 <= s0; k1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£
 				/*if (k1 == 0)
 				{
 				rhs[k1] = 0.0;
@@ -874,8 +881,12 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 				{
 					rhs[k1] = 0.0;
 				}
+				if (k1 == s0)
+				{
+					halfgrid_before[k1*Nx*Ny + i*Ny + j].by = halfgrid_now[k1*Nx*Ny + i*Ny + j].by;
+				}
 
-				//±£´æ½á¹û
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
 
 			}
@@ -885,19 +896,19 @@ void norm_gsscalc_by(Grid* halfgrid_now, int step)
 	}
 }
 
-
+//2017.03.30æ ¸å¯¹ by åˆ˜æ™ºè¶…
 void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 {
-	//CPMLµÄpsiÊı×é²¿·Ö
-	double psi_ezx[Nx*Ny * Nz_size];
-	for (auto i = begin(psi_ezx); i != end(psi_ezx);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	//CPMLçš„psiæ•°ç»„éƒ¨åˆ†
+	double psi_ezx[Nx * Ny * Nz_size];
+	for (int i = 0; i < Nx * Ny * Nz_size;++i) { psi_ezx[i] = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 	//for (int i = 0; i < Nx*Ny * Nz_size; i++) cout <<i<<"  :"<< psi_ezx[i] << endl;
 
-	double psi_ezy[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_ezy); i != end(psi_ezy);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	double psi_ezy[Nx * Ny *  Nz_size];
+	for (int i = 0; i < Nx * Ny * Nz_size; ++i) { psi_ezy[i] = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 	//for (int i = 0; i < Nx*Ny * Nz_size; i++) cout << i << "  :" << psi_ezy[i] << endl;
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = Nx - 1;
 
 	int nnz = 3 * N - 2;
@@ -908,19 +919,19 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	//Çó½âÆ÷Ö¸Õë	
+	//æ±‚è§£å™¨æŒ‡é’ˆ	
 	void *hSolver = NULL;
 
-	//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	//é…ç½®å‚æ•°åˆå§‹åŒ–
 	double setting[32];
 	for (auto i = begin(setting); i != end(setting);) { *i++ = 0.0; }
 
 	int type = 0;
 
-	//´¦ÀíptrÊı×é  ptr----->ptrµÄ³¤¶ÈÊÇN+1¡£ptr[i]¼ÇÂ¼µÚiÁĞµÚÒ»¸ö·ÇÁãÔªµÄÎ»ÖÃ,×îºóÒ»¸öÔªËØptr[N]=nnz
+	//å¤„ç†ptræ•°ç»„  ptr----->ptrçš„é•¿åº¦æ˜¯N+1ã€‚ptr[i]è®°å½•ç¬¬iåˆ—ç¬¬ä¸€ä¸ªéé›¶å…ƒçš„ä½ç½®,æœ€åä¸€ä¸ªå…ƒç´ ptr[N]=nnz
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -929,7 +940,7 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 		ptr[i] = ptr[i - 1] + 3;
 	}
 
-	//´¦ÀíindÊı×é ind----->Ã¿¸ö·ÇÁãÔªµÄĞĞ±ê,ÒÔÁĞÎª±àºÅË³Ğò
+	//å¤„ç†indæ•°ç»„ ind----->æ¯ä¸ªéé›¶å…ƒçš„è¡Œæ ‡,ä»¥åˆ—ä¸ºç¼–å·é¡ºåº
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -942,14 +953,14 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 		j++;
 	}
 
-	//Éú³ÉÏµÊı¾ØÕó
+	//ç”Ÿæˆç³»æ•°çŸ©é˜µ
 	for (int k = s0+1; k < Nz - 1; k++)
 	{
 		for (int j = 0; j < Ny - 1; j++)
 		{
 			for (int i = 0; i < Nx - 1; i++)
 			{
-				//powº¯ÊıÊÇ×óÖµµÄ
+				//powå‡½æ•°æ˜¯å·¦å€¼çš„
 				double kx = 1 + ((kxmax - 1) * pow((k - s0)*dz, 4)) / pow(d, 4);
 				double ky = 1 + ((kymax - 1) * pow((k - s0)*dz, 4)) / pow(d, 4);
 
@@ -965,44 +976,61 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 				double by = pow(e, -1 * (sigma_y / (ky + alpha_y))*(dt / epsl0));
 				double ay = sigma_y*(by - 1) / (ky*(sigma_y + ky*sigma_y));
 
-				//Éú³ÉÏµÊı¾ØÕó
+				//ç”Ÿæˆç³»æ•°çŸ©é˜µ
 				double aez = (-1 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / kx)*(1 / dx)*(1 / dx));
 				double bez = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / mur0)*(1 / kx)*(1 / dx)*(1 / dx));
 				double cez = aez;
 
-				//valÊı×é´¦Àí
+				//valæ•°ç»„å¤„ç†
 				val[0] = bez;
 				val[2] = cez;
 				val[3 * N - 3] = bez;
 				val[3 * N - 5] = aez;
-				for (int i = 1, j = 2; i + 3 < 3 * N - 2; i = i + 3)
+				for (int i = 1; i + 3 < 3 * N - 2; i = i + 3)
 				{
 					val[i] = aez;
 					val[i + 2] = bez;
-					val[i + 4] = cez;
-					j++;
+					val[i + 4] = cez;					
 				}
 				//
 				psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] = bx * psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] + ax * (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / dx;
 
 				psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j] = by * psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j] + ay * (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / dy;
 
-				//´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
-				if (i == 0 && j != 0)
-					rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
-				else if (j == 0 && i != 0)
-					rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
-				else if (i == 0 && j == 0)
-					rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
-				else if (i != 0 && j != 0)
-					rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
-					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
+				//å¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
+				if (i == 0)
+				{
+					if (j == 0)
+					{
+						rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
+
+					}
+					else if (j != 0)
+					{
+						rhs[i] = bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
+
+					}
+				}
+				else if (i != 0)
+				{
+					if (j == 0)
+					{
+						rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
+
+					}
+					if (j != 0)
+					{
+						rhs[i] = aez*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].ez + bez*halfgrid_now[k*Nx*Ny + i*Ny + j].ez + cez*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].by) / (dx*kx) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx) / (dy*ky) + psi_ezx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_ezy[(k - s0-1)*Nx*Ny + i*Ny + j]);
+
+					}
+				}					
 			}
 
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1018,7 +1046,7 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -1026,12 +1054,12 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı								
-				//if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//´¦ÀíezµÄ±ß½çÎÊÌâ£¬ÔÚËÄ¸öÃæµÄÎ»ÖÃÓ¦¸ÃÎª0
-				//{
-				//	rhs[i1] = 0.0;
-				//}
-				//±£´æ½á¹û	
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£								
+				if (j == 0 || j == Ny - 2 || i1 == 0 || i1 == Nx - 2)//å¤„ç†ezçš„è¾¹ç•Œé—®é¢˜ï¼Œåœ¨å››ä¸ªé¢çš„ä½ç½®åº”è¯¥ä¸º0
+				{
+					rhs[i1] = 0.0;
+				}
+				//ä¿å­˜ç»“æœ
 
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].ez = rhs[i1];
 			}
@@ -1045,12 +1073,12 @@ void cpml_gsscalc_ez(Grid* halfgrid_now, int step)
 void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 {
 	double psi_exy[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_exy); i != end(psi_exy);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_exy); i != end(psi_exy);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 	double psi_exz[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_exz); i != end(psi_exz);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_exz); i != end(psi_exz);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = Ny - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -1060,16 +1088,16 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
-	double setting[32];//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
+	double setting[32];//é…ç½®å‚æ•°åˆå§‹åŒ–
 	for (auto i = begin(setting); i != end(setting);) { *i++ = 0.0; }
 
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -1077,7 +1105,7 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -1089,7 +1117,7 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -1112,14 +1140,14 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 				double ay = sigma_y*(by - 1) / (ky*(sigma_y + ky*sigma_y));
 
 				double bz = pow(e, -1 * (sigma_z / (kz + alpha_z))*(dt / epsl0));
-				double az = sigma_z*(by - 1) / (kz*(sigma_z + kz*sigma_z));
+				double az = sigma_z*(bz - 1) / (kz*(sigma_z + kz*sigma_z));//æ­¤å¤„å†™é”™ï¼Œ03.30
 
 
 				double aex = (-1 * (dt / 2)*(dt / 2)*(1 / (mur0*ky))*(1 / dy)*(1 / dy));
 				double bex = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / (mur0*ky))*(1 / dy)*(1 / dy));
 				double cex = aex;
 
-				//valÊı×é´¦Àí
+				//valæ•°ç»„å¤„ç†
 				val[0] = bex;
 				val[2] = cex;
 				val[3 * N - 3] = bex;
@@ -1135,14 +1163,14 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 
 				psi_exz[(k - s0-1)*Nx*Ny + i*Ny + j] = bz * psi_exz[(k - s0-1)*Nx*Ny + i*Ny + j] + az * (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / dz;
 
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (j == 0)
 					rhs[j] = bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / (dy*ky) - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / (dz*kz) + psi_exy[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_exz[(k - s0-1)*Nx*Ny + i*Ny + j]);
 				else if (j != 0)
 					rhs[j] = aex*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].ex + bex*halfgrid_now[k*Nx*Ny + i*Ny + j].ex + cex*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bz) / (dy*ky) - (halfgrid_now[k*Nx*Ny + i*Ny + j].by - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by) / (dz*kz) + psi_exy[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_exz[(k - s0-1)*Nx*Ny + i*Ny + j]);
-			}//GSSÇó½â
+			}//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1158,7 +1186,7 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -1166,11 +1194,11 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı				
-				/*if (j1 == 0 || j1 == Ny - 2 || k == Nz - 2)
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£				
+				if (j1 == 0 || j1 == Ny - 2 || k == Nz - 2)
 				{
 					rhs[j1] = 0.0;
-				}*/
+				}
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].ex = rhs[j1];
 			}
 			if (hSolver != NULL)
@@ -1179,36 +1207,36 @@ void cpml_gsscalc_ex(Grid* halfgrid_now, int step)
 	}
 }
 
-void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
+void cpml_gsscalc_ey(Grid* halfgrid_now, Grid* halfgrid_before, int step)
 {
 	double psi_eyz[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_eyz); i != end(psi_eyz);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_eyz); i != end(psi_eyz);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 	double psi_eyx[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_eyx); i != end(psi_eyx);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_eyx); i != end(psi_eyx);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = (Nz - s0 - 2);
 	int nnz = 3 * N - 2;
 	int nRow = N;
 	int nCol = N;
 
-	int ptr[Nz];
+	int ptr[Nz - s0 - 2+1];//æ­¤å¤„å¤§å°æœ‰é”™ï¼Œ03.30
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 
-	double setting[32];//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	double setting[32];//é…ç½®å‚æ•°åˆå§‹åŒ–
 	for (auto i = begin(setting); i != end(setting);) { *i++ = 0.0; }
 
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -1217,7 +1245,7 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 		ptr[i] = ptr[i - 1] + 3;
 	}
 
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -1230,7 +1258,7 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 		j++;
 	}
 
-	//rhsÊı×é³õÊ¼»¯
+	//rhsæ•°ç»„åˆå§‹åŒ–
 	for (int i = 0; i < N; i++)
 		rhs[i] = 0.0;
 
@@ -1260,36 +1288,51 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 				double bey = (epsl0 + 2 * (dt / 2)*(dt / 2)*(1 / (mur0*kz))*(1 / dz)*(1 / dz));
 				double cey = aey;
 
-				//valÊı×é´¦Àí
+				//valæ•°ç»„å¤„ç†
 				val[0] = bey;
 				val[2] = cey;
 				val[3 * N - 3] = bey;
 				val[3 * N - 5] = aey;
-				for (int i = 1, j = 2; i + 3 < 3 * N - 2; i = i + 3)
+				for (int i = 1; i + 3 < 3 * N - 2; i = i + 3)
 				{
 					val[i] = aey;
 					val[i + 2] = bey;
 					val[i + 4] = cey;
-					j++;
+					
 				}
-				psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] = bz * psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] + az * (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bx) / dz;
+				psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] = bz * psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] + az * (halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k-1)*Nx*Ny + i*Ny + j].bx) / dz;//æ­¤å¤„æœ‰è¯¯ï¼Œ03.30
 
-				psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j] = bx * psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j] + ax * (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bz) / dx;
+				psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j] = bx * psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j] + ax * (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i-1)*Ny + j].bz) / dx;//æ­¤å¤„æœ‰è¯¯ï¼Œ03.30
 
 				if (k == s0+1)
 				{
+					//if (i == 0)
+					//{
+					//	rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					//		+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / (dx*kx) + psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j]);
+					//	rhs[k] -= aey*halfgrid_now[(k - 2)*Nx*Ny + i*Ny + j].ey;
+					//}
+					//else
+					//{
+					//	rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+					//		+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / (kx*dx) + psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j]);
+					//	//åœ¨zæ–¹å‘ï¼Œä¼ æ’­æ–¹å‘ä¸Šï¼Œè¦å¯¹æ–¹ç¨‹å³è¾¹é¡¹è¿›è¡Œå¤„ç†ï¼Œå‡å»Açš„é¡¹æ‰èƒ½æ„æˆä¸‰å¯¹è§’çŸ©é˜µ
+					//	rhs[k] -= aey*halfgrid_now[(k - 2)*Nx*Ny + i*Ny + j].ey;
+					//}
+
 					if (i == 0)
 					{
-						rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
-							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / (dx*kx) + psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j]);
-						rhs[k] -= aey*halfgrid_now[(k - 2)*Nx*Ny + i*Ny + j].ey;
+						rhs[k] =  aey*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].ey+bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz) / (dx*kx) + psi_eyz[(k - s0 - 1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0 - 1)*Nx*Ny + i*Ny + j]);	
+						rhs[k] -= aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey;
 					}
 					else
 					{
-						rhs[k] = aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
-							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / (kx*dx) + psi_eyz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0-1)*Nx*Ny + i*Ny + j]);
-						//ÔÚz·½Ïò£¬´«²¥·½ÏòÉÏ£¬Òª¶Ô·½³ÌÓÒ±ßÏî½øĞĞ´¦Àí£¬¼õÈ¥AµÄÏî²ÅÄÜ¹¹³ÉÈı¶Ô½Ç¾ØÕó
-						rhs[k] -= aey*halfgrid_now[(k - 2)*Nx*Ny + i*Ny + j].ey;
+						rhs[k] = aey*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].ey + bey*halfgrid_now[k*Nx*Ny + i*Ny + j].ey + cey*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey
+							+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j].bx - halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].bx) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j].bz - halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz) / (kx*dx) + psi_eyz[(k - s0 - 1)*Nx*Ny + i*Ny + j] - psi_eyx[(k - s0 - 1)*Nx*Ny + i*Ny + j]);
+						rhs[k] -= aey*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].ey;
+						//åœ¨zæ–¹å‘ï¼Œä¼ æ’­æ–¹å‘ä¸Šï¼Œè¦å¯¹æ–¹ç¨‹å³è¾¹é¡¹è¿›è¡Œå¤„ç†ï¼Œå‡å»Açš„é¡¹æ‰èƒ½æ„æˆä¸‰å¯¹è§’çŸ©é˜µ
+						
 					}
 				}
 				else if (k != s0+1)
@@ -1307,7 +1350,7 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 				}
 
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1323,16 +1366,16 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
-			//½á¹ûµÄĞŞÕıÓë±£´æ
+			//ç»“æœçš„ä¿®æ­£ä¸ä¿å­˜
 			for (int k1 = s0+1; k1 < Nz - 1; k1++)
 			{
-				//if (k1 == 0) //¶Ô½á¹û½øĞĞĞŞÕı
-				//{//²»¸Ä±äÔ´µÄÖµ					
+				//if (k1 == 0) //å¯¹ç»“æœè¿›è¡Œä¿®æ­£
+				//{//ä¸æ”¹å˜æºçš„å€¼					
 				//	if (step*dt < 2 * T)
 				//	{
 				//		double rising_edge = (step*dt) / (2 * T);
@@ -1351,11 +1394,12 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 				//rhs[k1] = temp_ey*sin(omega*step*dt);//ey
 				//}
 
-				/*if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
+				if (i == 0 || i == Nx - 2 || k1 == Nz - 2)
 				{
 					rhs[k1] = 0.0;
-				}*/
-				//±£´æ½á¹û
+				}
+				//ä¿å­˜ç»“æœ
+				
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].ey = rhs[k1];
 			}
 
@@ -1368,13 +1412,13 @@ void cpml_gsscalc_ey(Grid* halfgrid_now, int step)
 void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 {
 	double psi_hzy[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hzy); i != end(psi_hzy);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hzy); i != end(psi_hzy);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 	double psi_hzx[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hzx); i != end(psi_hzx);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hzx); i != end(psi_hzx);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = Nx - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -1384,16 +1428,16 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
 	for (auto i = begin(setting); i != end(setting);) { *i++ = 0.0; }
 
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -1401,7 +1445,7 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -1413,7 +1457,7 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 		ind[i + 2] = j + 2;
 		j++;
 	}
-	//valÊı×é´¦Àí
+	//valæ•°ç»„å¤„ç†
 
 	for (int k = s0+1; k < Nz - 1; k++)
 	{
@@ -1439,7 +1483,7 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 				double ahz = (-1 * (dt / 2)*(dt / 2)*(1 / (epsl0*kx))*(1 / dx)*(1 / dx));
 				double bhz = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / (epsl0*kx))*(1 / dx)*(1 / dx));
 				double chz = ahz;
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 
 				val[0] = bhz;
 				val[2] = chz;
@@ -1465,7 +1509,7 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 					rhs[i] = ahz*halfgrid_now[k*Nx*Ny + (i - 1)*Ny + j].bz + bhz*halfgrid_now[k*Nx*Ny + i*Ny + j].bz + chz*halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].bz
 					+ dt*((halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / (dy*ky) - (halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / (dx*kx) + psi_hzy[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_hzx[(k - s0-1)*Nx*Ny + i*Ny + j]);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1481,15 +1525,15 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;	//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;	//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
 			GSS_solve_ld(hSolver, nRow, nCol, ptr, ind, val, rhs);
 			for (int i1 = 0; i1 < Nx - 1; i1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı				
-				//if (k == 0)//²»¸Ä±äÊäÈëÔ´µÄÖµ
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£				
+				//if (k == 0)//ä¸æ”¹å˜è¾“å…¥æºçš„å€¼
 				//{
 				//	double rising_edge = (step*dt) / (2 * T);
 
@@ -1507,11 +1551,11 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 				//	}
 				//	
 				//}
-				//if (k == Nz - 2)//ÔÚÓÒ½ØÃæ¼ÓÔ´¶øÇÒÊ¹Æä¸³ÖµÎª0£¬¿ÉÒÔÏàµ±ÓÚÀíÏëÎüÊÕ±ß½ç
-				//{
-				//	rhs[i1] = 0.0;
-				//}
-				//±£´æ½á¹û
+				if (k == Nz - 2)//åœ¨å³æˆªé¢åŠ æºè€Œä¸”ä½¿å…¶èµ‹å€¼ä¸º0ï¼Œå¯ä»¥ç›¸å½“äºç†æƒ³å¸æ”¶è¾¹ç•Œ
+				{
+					rhs[i1] = 0.0;
+				}
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k*Nx*Ny + i1*Ny + j].bz = rhs[i1];
 			}
 
@@ -1525,12 +1569,12 @@ void cpml_gsscalc_bz(Grid* halfgrid_now, int step)
 void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 {
 	double psi_hxz[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hxz); i != end(psi_hxz);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hxz); i != end(psi_hxz);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 	double psi_hxy[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hxy); i != end(psi_hxy);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hxy); i != end(psi_hxy);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
 	constexpr int N = Ny - 1;
 	int nnz = 3 * N - 2;
 	int nRow = N;
@@ -1540,16 +1584,16 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
 	for (auto i = begin(setting); i != end(setting);) { *i++ = 0.0; }
-	//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -1557,7 +1601,7 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -1594,7 +1638,7 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 				double bhx = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / (epsl0*ky))*(1 / dy)*(1 / dy));
 				double chx = ahx;
 
-				//valÊı×é´¦Àí
+				//valæ•°ç»„å¤„ç†
 				val[0] = bhx;
 				val[2] = chx;
 				val[3 * N - 3] = bhx;
@@ -1610,7 +1654,7 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 
 				psi_hxy[(k - s0-1)*Nx*Ny + i*Ny + j] = by * psi_hxy[(k - s0-1)*Nx*Ny + i*Ny + j] + ay * (halfgrid_now[k*Nx*Ny + i*Ny + j+1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / dy;
 
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (j == 0)
 					rhs[j] = bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / (dy*ky) + psi_hxz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_hxy[(k - s0-1)*Nx*Ny + i*Ny + j]);
@@ -1618,7 +1662,7 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 					rhs[j] = ahx*halfgrid_now[k*Nx*Ny + i*Ny + j - 1].bx + bhx*halfgrid_now[k*Nx*Ny + i*Ny + j].bx + chx*halfgrid_now[k*Nx*Ny + i*Ny + j + 1].bx
 					+ dt*((halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ey - halfgrid_now[k*Nx*Ny + i*Ny + j].ey) / (dz*kz) - (halfgrid_now[k*Nx*Ny + i*Ny + j + 1].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / (dy*ky) + psi_hxz[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_hxy[(k - s0-1)*Nx*Ny + i*Ny + j]);
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1634,7 +1678,7 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -1642,16 +1686,16 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 
 			for (int j1 = 0; j1 < Ny - 1; j1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£
 				/*if (k == 0)
 				{
 				rhs[j1] = -1 * (X*bate / pi)*hm*sin((pi / X)*i*dx)*sin(omega*step*dt);
 				}*/
-				/*if (i == 0 || i == Nx - 2)
+				if (i == 0 || i == Nx - 2)
 				{
-				rhs[j1] = 0.0;
-				}*/
-				//±£´æ½á¹û
+				   rhs[j1] = 0.0;
+				}
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k*Nx*Ny + i*Ny + j1].bx = rhs[j1];
 			}
 			if (hSolver != NULL)
@@ -1661,35 +1705,35 @@ void cpml_gsscalc_bx(Grid* halfgrid_now, int step)
 
 }
 
-void cpml_gsscalc_by(Grid* halfgrid_now, int step)
+void cpml_gsscalc_by(Grid* halfgrid_now, Grid* halfgrid_before, int step)
 {
 	double psi_hyx[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hyx); i != end(psi_hyx);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hyx); i != end(psi_hyx);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
 	double psi_hyz[Nx*Ny * (Nz - s0 - 2)];
-	for (auto i = begin(psi_hyz); i != end(psi_hyz);) { *i++ = 0.0; }//Êı×é³õÊ¼»¯
+	for (auto i = begin(psi_hyz); i != end(psi_hyz);) { *i++ = 0.0; }//æ•°ç»„åˆå§‹åŒ–
 
-	int nRet;//GSSº¯ÊıµÄ·µ»ØÖµ
-	constexpr int N = (Nz - s0 - 2);
+	int nRet;//GSSå‡½æ•°çš„è¿”å›å€¼
+	constexpr int N = Nz - s0 - 2;
 	int nnz = 3 * N - 2;
 	int nRow = N;
 	int nCol = N;
 
-	int ptr[Nz];
+	int ptr[Nz - s0 - 2+1];
 	int ind[3 * N - 2];
 	double val[3 * N - 2];
 	double rhs[N];
-	//rhsÊı×é³õÊ¼»¯,·½³ÌÓÒ¶Ë³£ÊıÏî
+	//rhsæ•°ç»„åˆå§‹åŒ–,æ–¹ç¨‹å³ç«¯å¸¸æ•°é¡¹
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	void *hSolver = NULL;//Çó½âÆ÷Ö¸Õë
+	void *hSolver = NULL;//æ±‚è§£å™¨æŒ‡é’ˆ
 	double setting[32];
 	for (auto i = begin(rhs); i != end(rhs);) { *i++ = 0.0; }
 
-	//ÅäÖÃ²ÎÊı³õÊ¼»¯
+	//é…ç½®å‚æ•°åˆå§‹åŒ–
 	int type = 0;
 
-	//´¦ÀíptrÊı×é
+	//å¤„ç†ptræ•°ç»„
 	ptr[0] = 0;
 	ptr[1] = 2;
 	ptr[N] = 3 * N - 2;
@@ -1697,7 +1741,7 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 	{
 		ptr[i] = ptr[i - 1] + 3;
 	}
-	//´¦ÀíindÊı×é
+	//å¤„ç†indæ•°ç»„
 	ind[0] = 0;
 	ind[1] = 1;
 	ind[3 * N - 3] = N - 1;
@@ -1731,11 +1775,11 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 				double bz = pow(e, -1 * (sigma_z / (kz + alpha_z))*(dt / epsl0));
 				double az = sigma_z*(bz - 1) / (kz*(sigma_z + kz*sigma_z));
 
-				double ahy = (-1 * (dt / 2)*(dt / 2)*(1 / (epsl0*kx))*(1 / dz)*(1 / dz));
-				double bhy = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / (epsl0*kx))*(1 / dz)*(1 / dz));
+				double ahy = (-1 * (dt / 2)*(dt / 2)*(1 / (epsl0*kz))*(1 / dz)*(1 / dz));//æ­¤å¤„é”™ 03.30
+				double bhy = (mur0 + 2 * (dt / 2)*(dt / 2)*(1 / (epsl0*kz))*(1 / dz)*(1 / dz));
 				double chy = ahy;
 
-				//valÊı×é´¦Àí
+				//valæ•°ç»„å¤„ç†
 				val[0] = bhy;
 				val[2] = chy;
 				val[3 * N - 3] = bhy;
@@ -1753,13 +1797,13 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 				psi_hyz[(k - s0-1)*Nx*Ny + i*Ny + j] = bz * psi_hyz[(k - s0-1)*Nx*Ny + i*Ny + j] + az * (halfgrid_now[(k+1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / dz;
 
 
-				//Ê×ÏÈ´¦Àí¾ØÕó·½³ÌµÄÓÒ¶ËÏîrhsÊı×é
+				//é¦–å…ˆå¤„ç†çŸ©é˜µæ–¹ç¨‹çš„å³ç«¯é¡¹rhsæ•°ç»„
 				if (k == s0+1)
 				{
-					rhs[k] = ahy*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by + bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
+					rhs[k] = ahy*halfgrid_before[(k - 1)*Nx*Ny + i*Ny + j].by + bhy*halfgrid_now[k*Nx*Ny + i*Ny + j].by + chy*halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].by
 						+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / (dx*kx) - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / (dz*kz) + psi_hyx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_hyz[(k - s0-1)*Nx*Ny + i*Ny + j]);
 
-					rhs[k] -= ahy*halfgrid_now[(k - 2)*Nx*Ny + i*Ny + j].by;
+					rhs[k] -= ahy*halfgrid_now[(k - 1)*Nx*Ny + i*Ny + j].by;
 				}
 				else
 				{
@@ -1767,7 +1811,7 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 						+ dt*((halfgrid_now[k*Nx*Ny + (i + 1)*Ny + j].ez - halfgrid_now[k*Nx*Ny + i*Ny + j].ez) / (dx*kx) - (halfgrid_now[(k + 1)*Nx*Ny + i*Ny + j].ex - halfgrid_now[k*Nx*Ny + i*Ny + j].ex) / (dz*kz) + psi_hyx[(k - s0-1)*Nx*Ny + i*Ny + j] - psi_hyz[(k - s0-1)*Nx*Ny + i*Ny + j]);
 				}
 			}
-			//GSSÇó½â
+			//GSSæ±‚è§£
 			nRet = GSS_init_ld(nRow, nCol, ptr, ind, val, type, setting);
 			if (nRet != GRUS_OK) {
 				printf("\tERROR at init GSS solver. ERROR CODE:%d\r\n", nRet);
@@ -1783,7 +1827,7 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 			nRet = GSS_numeric_ld(nRow, nCol, ptr, ind, val, hSolver);
 			if (nRet != GRUS_OK) {
 				printf("\r\n\tERROR at NUMERIC FACTORIZATION. ERROR CODE:%d\r\n", nRet);
-				hSolver = NULL;		//±ØĞëÉèÖÃÎªNULL,GSSÒÑ×Ô¶¯ÊÍ·ÅÄÚ´æ
+				hSolver = NULL;		//å¿…é¡»è®¾ç½®ä¸ºNULL,GSSå·²è‡ªåŠ¨é‡Šæ”¾å†…å­˜
 				exit(0);
 			}
 
@@ -1791,17 +1835,17 @@ void cpml_gsscalc_by(Grid* halfgrid_now, int step)
 
 			for (int k1 = s0+1; k1 < Nz - 1; k1++)
 			{
-				//¶Ô½á¹û½øĞĞĞŞÕı
+				//å¯¹ç»“æœè¿›è¡Œä¿®æ­£
 				/*if (k1 == 0)
 				{
 				rhs[k1] = 0.0;
 				}*/
-			/*	if (j == 0 || j == Ny - 2)
+				if (j == 0 || j == Ny - 2)
 				{
-				rhs[k1] = 0.0;
-				}*/
+				   rhs[k1] = 0.0;
+				}
 
-				//±£´æ½á¹û
+				//ä¿å­˜ç»“æœ
 				halfgrid_now[k1*Nx*Ny + i*Ny + j].by = rhs[k1];
 
 			}

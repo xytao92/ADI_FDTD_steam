@@ -9,7 +9,7 @@
 int main()
 {
 	clock_t start_time = clock();
-	initGrid(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//对网格数据进行初始化
+	initGrid(halfgrid_before, halfgrid_now);//对网格数据进行初始化
 	int choice;
 
 	while (TRUE)
@@ -33,18 +33,25 @@ int main()
 		}
 		case 2:
 		{
-			adi_fdtd_leapforg_cpml_GSS(halfgrid_now);//进行计算
+			adi_fdtd_leapforg_cpml_GSS(halfgrid_now, halfgrid_before);//进行计算
 			continue;
 		}
 		case 3:
 		{
 			double result = CFL_calc();
 			double fc = fc_calc();
-			cout << "计算模型为： \n" << "Z: " << Z << "  Nz: " << Nz << "  dz: " << dz << endl;
-			cout << "X: " << X << "  Nx: " << Nx << "  dx: " << dx << endl;
-			cout << "Y: " << Y << "  Ny: " << Ny << "  dy: " << dy << endl;
-			cout << "此结构下，截止频率fc为： " << fc << endl;
-			cout << "在满足CFL稳定性条件下: dt <= "<< result << endl;
+			cout << " --------计算模型-------- \n\n" << "Z: \t" << Z << "  X: \t" << X << "  Y: \t" << Y << endl;
+			cout << "\n" << endl;
+			cout << " --------网格数-------- \n\n" << "Nx: \t" << Nx << "  Ny: \t" << Ny << "  Nz: \t" << Nz << endl;
+			cout << "\n" << endl;
+			cout << " --------网格大小-------- \n\n" << "dx: \t" << dx << "  dy: \t" << dy << "  dz: \t" << dz << endl;
+			cout << "\n" << endl;
+			cout << "此结构下，截止频率fc为：\t " << fc << endl;
+			cout << "在满足CFL稳定性条件下: dt <= \t"<< result << endl;
+			cout << "\n" << endl;
+			cout << " 若要观察到至少 10个 周期的波形，输入源频率: " << " > " << 10 / (400 * dt);
+
+			
 			cout << '\n' << endl;//进行计算
 			continue;
 		}
@@ -67,11 +74,12 @@ int main()
 
 		}
 
-		free(halfgrid_beforeX2, halfgrid_before, halfgrid_now);//释放空间
+		free(halfgrid_before, halfgrid_now);//释放空间
 
 		clock_t end_time = clock();
 		cout << "Running time: " << static_cast<float>(end_time - start_time) / CLOCKS_PER_SEC << " s" << endl;
 		system("pause");
 		return 0;
+
 	}
 }
